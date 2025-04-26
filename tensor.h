@@ -3,19 +3,16 @@
 
 #include <vector>
 
-#ifdef __OBJC__
-@class CuteTensorImpl;
-#else
-typedef struct objc_object CuteTensorImpl;
-#endif
+#include "macros.h"
+
+CUTE_OBJC_FORWARD_DECLARATION(CuteTensorImpl);
 
 #ifdef __OBJC__
-#    include <Foundation/Foundation.h>
-#    include <Metal/Metal.h>
-typedef id<MTLBuffer> MTLBufferPtr;
-#else
-typedef void* MTLBufferPtr;
+#include <Foundation/Foundation.h>
+#include <Metal/Metal.h>
 #endif
+
+CUTE_TYPE_ALIAS(id<MTLBuffer>, MTLBufferPtr);
 
 namespace cute {
 
@@ -42,11 +39,7 @@ public:
     std::vector<int> Shape() const;
 
 private:
-#ifdef __OBJC__
-    __strong CuteTensorImpl* impl_;
-#else
     CuteTensorImpl* impl_;
-#endif
 };
 
 }  // namespace cute

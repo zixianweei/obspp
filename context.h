@@ -4,25 +4,19 @@
 #include <string>
 #include <vector>
 
-#ifdef __OBJC__
-@class CuteContextImpl;
-#else
-typedef struct objc_object CuteContextImpl;
-#endif
+#include "macros.h"
+
+CUTE_OBJC_FORWARD_DECLARATION(CuteContextImpl);
 
 #ifdef __OBJC__
-#    include <Foundation/Foundation.h>
-#    include <Metal/Metal.h>
-typedef id<MTLDevice> MTLDevicePtr;
-typedef id<MTLCommandQueue> MTLCommandQueuePtr;
-typedef id<MTLComputePipelineState> MTLComputePipelineStatePtr;
-typedef id<MTLComputeCommandEncoder> MTLComputeCommandEncoderPtr;
-#else
-typedef void* MTLDevicePtr;
-typedef void* MTLCommandQueuePtr;
-typedef void* MTLComputePipelineStatePtr;
-typedef void* MTLComputeCommandEncoderPtr;
+#include <Foundation/Foundation.h>
+#include <Metal/Metal.h>
 #endif
+
+CUTE_TYPE_ALIAS(id<MTLDevice>, MTLDevicePtr);
+CUTE_TYPE_ALIAS(id<MTLCommandQueue>, MTLCommandQueuePtr);
+CUTE_TYPE_ALIAS(id<MTLComputePipelineState>, MTLComputePipelineStatePtr);
+CUTE_TYPE_ALIAS(id<MTLComputeCommandEncoder>, MTLComputeCommandEncoderPtr);
 
 namespace cute {
 
@@ -56,11 +50,8 @@ public:
 
 private:
     Context();
-#ifdef __OBJC__
-    __strong CuteContextImpl* impl_;
-#else
+
     CuteContextImpl* impl_;
-#endif
 };
 
 }  // namespace cute
