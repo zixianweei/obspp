@@ -1,0 +1,18 @@
+[2025-04-19 20:51:32.321] [info] [639603] cute instance init.
+[2025-04-19 20:51:32.322] [info] [639603] -[ContextImpl init]: allocating
+[2025-04-19 20:51:32.332] [info] [639603] -[ContextImpl init]: found device: Apple M4
+[2025-04-19 20:51:32.370] [info] [639603] -[ContextImpl init]: using device: Apple M4
+[2025-04-19 21:16:07.461] [info] [656508] cute instance init.
+[2025-04-19 21:16:07.461] [info] [656508] -[ContextImpl init]: allocating
+[2025-04-19 21:16:07.472] [info] [656508] -[ContextImpl init]: found device: Apple M4
+[2025-04-19 21:16:07.509] [info] [656508] -[ContextImpl init]: using device: Apple M4
+[2025-04-19 21:16:07.509] [error] [656508] -[ContextImpl init]: error: Error Domain=MTLLibraryErrorDomain Code=6 "library not found" UserInfo={NSLocalizedDescription=library not found}
+[2025-04-19 21:16:25.355] [info] [657251] cute instance init.
+[2025-04-19 21:16:25.355] [info] [657251] -[ContextImpl init]: allocating
+[2025-04-19 21:16:25.367] [info] [657251] -[ContextImpl init]: found device: Apple M4
+[2025-04-19 21:16:25.397] [info] [657251] -[ContextImpl init]: using device: Apple M4
+[2025-04-19 21:16:25.398] [error] [657251] -[ContextImpl init]: error: Error Domain=MTLLibraryErrorDomain Code=6 "library not found" UserInfo={NSLocalizedDescription=library not found}
+[2025-04-19 21:17:04.598] [info] [658220] cute instance init.
+[2025-04-19 21:17:04.598] [info] [658220] -[ContextImpl init]: allocating
+[2025-04-19 21:17:04.608] [info] [658220] -[ContextImpl init]: found device: Apple M4
+[2025-04-19 21:17:04.639] [info] [658220] -[ContextImpl init]: using device: Apple M4
