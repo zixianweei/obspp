@@ -7,16 +7,16 @@
 
 #include "context.h"
 #include "logger.h"
-
-#if !__has_feature(objc_arc)
-#error "ARC is off"
-#endif
+#include "macros.h"
 
 @interface CuteTensorImpl : NSObject
 @property (strong, nonatomic) id<MTLBuffer> buffer;
 @property (assign, nonatomic) cute::Format format;
 @property (assign, nonatomic) std::vector<int> shape;
 
+#if !__has_feature(objc_arc)
+- (void)dealloc;
+#endif
 - (BOOL)fromBytes:(const void*)data
             shape:(const std::vector<int>&)shape
            format:(cute::Format)format;
@@ -40,6 +40,14 @@
     }
     return self;
 }
+
+#if !__has_feature(objc_arc)
+- (void)dealloc
+{
+    SAFE_RELEASE(_buffer);
+    [super dealloc];
+}
+#endif
 
 - (BOOL)fromBytes:(const void*)data
             shape:(const std::vector<int>&)shape
@@ -128,6 +136,9 @@ Tensor::Tensor()
 
 Tensor::~Tensor()
 {
+#if !__has_feature(objc_arc)
+    [impl_ release];
+#endif
     impl_ = nullptr;
 }
 

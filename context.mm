@@ -3,6 +3,7 @@
 #include <string>
 
 #include "logger.h"
+#include "macros.h"
 
 #pragma mark - ContextImpl
 
@@ -22,6 +23,9 @@ typedef NSMutableArray<id<MTLCommandBuffer>>* CommandBufferArray;
 @property (strong, nonatomic) CommandBufferArray schedCommandBuffer;
 @property (strong, nonatomic) id<MTLCaptureScope> captureScope;
 
+#if !__has_feature(objc_arc)
+- (void)dealloc;
+#endif
 - (id<MTLComputePipelineState>)findComputePipelineState:(NSString*)kernelName;
 - (id<MTLComputeCommandEncoder>)createEncoder;
 - (BOOL)commit;
@@ -114,6 +118,21 @@ typedef NSMutableArray<id<MTLCommandBuffer>>* CommandBufferArray;
 
     return self;
 }
+
+#if !__has_feature(objc_arc)
+- (void)dealloc
+{
+    SAFE_RELEASE(_device);
+    SAFE_RELEASE(_commandQueue);
+    SAFE_RELEASE(_library);
+    SAFE_RELEASE(_queue);
+    SAFE_RELEASE(_cachedCPS);
+    SAFE_RELEASE(_commandBuffer);
+    SAFE_RELEASE(_schedCommandBuffer);
+    SAFE_RELEASE(_captureScope);
+    [super dealloc];
+}
+#endif
 
 - (id<MTLComputePipelineState>)findComputePipelineState:(NSString*)kernelName
 {
