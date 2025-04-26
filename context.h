@@ -40,14 +40,6 @@ public:
     MTLComputeCommandEncoderPtr GetCommandEncoder();
     bool Commit();
 
-    void BeginCapture();
-    void EndCapture();
-
-#ifdef __OBJC__
-    MTLSize CalculateGridSize(const std::vector<int>& shape);
-    MTLSize CalculateThreadgroupSize(const MTLSize& gridSize);
-#endif
-
 private:
     Context();
 

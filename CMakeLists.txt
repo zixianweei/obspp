@@ -1,12 +1,31 @@
 cmake_minimum_required(VERSION 3.28)
 project(cute)
 
+# for metal shaders
 include(cmake/metal.cmake)
+file(GLOB_RECURSE CUTE_METAL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/shader/*.metal")
+message(STATUS "CUTE_METAL_SHADERS: ${CUTE_METAL_SHADERS}")
+foreach(CUTE_METAL_SHADER ${CUTE_METAL_SHADERS})
+    cmake_path(GET CUTE_METAL_SHADER STEM TGT_STEM)
+    string(CONCAT TGT_BASIC ${TGT_STEM} "_30.air")
+    string(CONCAT TGT_BFLOAT ${TGT_STEM} "_31.air")
+    list(APPEND AIR_BASIC ${TGT_BASIC})
+    list(APPEND AIR_BFLOAT ${TGT_BFLOAT})
+    cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BASIC} "-std=metal3.0")
+    cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BFLOAT} "-std=metal3.1")
+endforeach()
+cute_air_to_metallib(kernels_basic.metallib ${AIR_BASIC})
+cute_air_to_metallib(kernels_bfloat.metallib ${AIR_BFLOAT})
+add_custom_command(
+    COMMAND echo "// $$(date)" > metallib_dummy.cpp
+    DEPENDS kernels_basic.metallib kernels_bfloat.metallib
+    OUTPUT metallib_dummy.cpp
+    COMMENT "Updating metallibs timestamp"
+)
+add_custom_target(${PROJECT_NAME}_metallib DEPENDS kernels_basic.metallib kernels_bfloat.metallib metallib_dummy.cpp)
+set(CUTE_METALLIB_BINARY_DIR ${CMAKE_BINARY_DIR}/cute)
 
 find_package(spdlog CONFIG REQUIRED)
-
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 
 add_executable(${PROJECT_NAME} MACOSX_BUNDLE)
 set_target_properties(
@@ -16,13 +35,11 @@ set_target_properties(
     CXX_EXTENSIONS OFF
 )
 
-# set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
-
-# target_compile_definitions(
-#     ${PROJECT_NAME}
-#     PRIVATE
-#     HAS_CUTE_LOGGER
-# )
+target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    HAS_CUTE_LOGGER
+)
 
 target_compile_options(
     ${PROJECT_NAME}
@@ -34,6 +51,8 @@ target_link_options(
     ${PROJECT_NAME}
     PRIVATE
     -fsanitize=address
+    -Wl,-sectcreate,__TEXT,metal_basic,${CUTE_METALLIB_BINARY_DIR}/kernels_basic.metallib
+    -Wl,-sectcreate,__TEXT,metal_bfloat,${CUTE_METALLIB_BINARY_DIR}/kernels_bfloat.metallib
 )
 
 target_compile_definitions(
@@ -50,6 +69,8 @@ target_link_libraries(
     $<LINK_LIBRARY:FRAMEWORK,Metal>
     $<LINK_LIBRARY:FRAMEWORK,QuartzCore>
 )
+
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_metallib)
 
 target_sources(
     ${PROJECT_NAME}

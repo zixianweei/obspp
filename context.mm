@@ -2,8 +2,35 @@
 
 #include <string>
 
+#include <mach-o/dyld.h>
+#include <mach-o/getsect.h>
+
 #include "logger.h"
 #include "macros.h"
+
+static dispatch_data_t find_section_data(const std::string& section_name)
+{
+    uint32_t image_idx = 0U;
+    uint32_t image_count = _dyld_image_count();
+    for (uint32_t i = 0; i < image_count; i++) {
+        if (strstr(_dyld_get_image_name(i), "/cute")) {
+            image_idx = i;
+            break;
+        }
+    }
+
+    const struct mach_header_64* image_header = reinterpret_cast<const struct mach_header_64*>(_dyld_get_image_header(image_idx));
+
+    unsigned long section_size = 0;
+    const uint8_t* section_data = getsectiondata(image_header, "__TEXT", section_name.c_str(), &section_size);
+    if (section_data == nullptr) {
+        throw std::runtime_error("Can't find metal library section " + section_name);
+    }
+    return dispatch_data_create(section_data,
+        section_size,
+        dispatch_get_main_queue(),
+        ^() {});
+}
 
 #pragma mark - ContextImpl
 
@@ -21,7 +48,6 @@ typedef NSMutableArray<id<MTLCommandBuffer>>* CommandBufferArray;
 @property (strong, nonatomic) ComputePipelineStateDictionary cachedCPS;
 @property (strong, nonatomic) id<MTLCommandBuffer> commandBuffer;
 @property (strong, nonatomic) CommandBufferArray schedCommandBuffer;
-@property (strong, nonatomic) id<MTLCaptureScope> captureScope;
 
 #if !__has_feature(objc_arc)
 - (void)dealloc;
@@ -56,8 +82,6 @@ typedef NSMutableArray<id<MTLCommandBuffer>>* CommandBufferArray;
             [[_device name] UTF8String]);
     }
 
-    _captureScope = [[MTLCaptureManager sharedCaptureManager] defaultCaptureScope];
-
     if (_device != nil) {
         _hasSimdGroupReduction = [_device supportsFamily:MTLGPUFamilyApple7];
         _hasSimdGroupReduction |= [_device supportsFamily:MTLGPUFamilyMetal3];
@@ -77,28 +101,35 @@ typedef NSMutableArray<id<MTLCommandBuffer>>* CommandBufferArray;
     _queue = dispatch_queue_create("OpenCV_Metal", DISPATCH_QUEUE_CONCURRENT);
 
     if (_library == nil) {
-        @autoreleasepool {
-            // if not found the metal library
-            // then load then from metal files.
-            NSError* error;
-            NSString* libraryPath =
-                [NSString stringWithFormat:@"%@/source/nnn/cute/flip.metallib",
-                    NSHomeDirectory()];
-            if (libraryPath != nil) {
-                _library =
-                    [_device newLibraryWithURL:[NSURL fileURLWithPath:libraryPath]
-                                         error:&error];
-                if (error) {
-                    CUTE_LOG_ERROR("{}: error: {}", __func__,
-                        [[error description] UTF8String]);
-                    return nil;
-                }
-            } else {
-                CUTE_LOG_INFO("{}: cute.metallib not found, loading from source",
-                    __func__);
-                NSString* sourcePath;
-            }
+        NSError* error = nil;
+        _library = [_device newLibraryWithData:find_section_data("metal_basic") error:&error];
+        if (error) {
+            CUTE_LOG_ERROR("{}: error: {}", __func__, [[error description] UTF8String]);
+            return nil;
         }
+        CUTE_LOG_INFO("{}: create library from section", __func__);
+        // @autoreleasepool {
+        //     // if not found the metal library
+        //     // then load then from metal files.
+        //     NSError* error;
+        //     NSString* libraryPath =
+        //         [NSString stringWithFormat:@"%@/source/nnn/cute/flip.metallib",
+        //             NSHomeDirectory()];
+        //     if (libraryPath != nil) {
+        //         _library =
+        //             [_device newLibraryWithURL:[NSURL fileURLWithPath:libraryPath]
+        //                                  error:&error];
+        //         if (error) {
+        //             CUTE_LOG_ERROR("{}: error: {}", __func__,
+        //                 [[error description] UTF8String]);
+        //             return nil;
+        //         }
+        //     } else {
+        //         CUTE_LOG_INFO("{}: cute.metallib not found, loading from source",
+        //             __func__);
+        //         NSString* sourcePath;
+        //     }
+        // }
     }
 
     if (_commandBuffer == nil) {
@@ -129,7 +160,6 @@ typedef NSMutableArray<id<MTLCommandBuffer>>* CommandBufferArray;
     SAFE_RELEASE(_cachedCPS);
     SAFE_RELEASE(_commandBuffer);
     SAFE_RELEASE(_schedCommandBuffer);
-    SAFE_RELEASE(_captureScope);
     [super dealloc];
 }
 #endif
@@ -239,50 +269,6 @@ MTLComputeCommandEncoderPtr Context::GetCommandEncoder()
 bool Context::Commit()
 {
     return [impl_ commit];
-}
-
-void Context::BeginCapture()
-{
-    [[impl_ captureScope] beginScope];
-}
-
-void Context::EndCapture()
-{
-    [[impl_ captureScope] endScope];
-}
-
-MTLSize Context::CalculateGridSize(const std::vector<int>& shape)
-{
-    int width = shape.size() >= 1 ? shape.back() : 1;
-    int height = shape.size() >= 2 ? shape[shape.size() - 2] : 1;
-    int depth = 1;
-    for (int i = 0; i < int(shape.size()) - 2; ++i) {
-        depth *= shape[i];
-    }
-    return MTLSizeMake(width, height, depth);
-}
-
-MTLSize Context::CalculateThreadgroupSize(const MTLSize& gridSize)
-{
-    MTLSize maxSize = [[impl_ device] maxThreadsPerThreadgroup];
-    MTLSize groupSize = MTLSizeMake(1, 1, 1);
-
-    // 优先填充 width 维度
-    groupSize.width = MIN(maxSize.width, gridSize.width);
-
-    // 剩余容量分配给 height
-    groupSize.height = MIN(maxSize.height, gridSize.height);
-    if (groupSize.width * groupSize.height > maxSize.width) {
-        groupSize.height = 1;
-    }
-
-    // 最后填充 depth
-    groupSize.depth = MIN(maxSize.depth, gridSize.depth);
-    if (groupSize.width * groupSize.height * groupSize.depth > maxSize.width) {
-        groupSize.depth = 1;
-    }
-
-    return groupSize;
 }
 
 } // namespace cute

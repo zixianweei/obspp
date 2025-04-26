@@ -34,6 +34,12 @@ int main()
     {
         idx++;
         cap.read(frame);
+        if (frame.empty())
+        {
+            CUTE_LOG_INFO("{}: read empty frame. exiting", __func__);
+            break;
+        }
+
         cv::resize(frame, frame, cv::Size(640, 360));
 
         // flip

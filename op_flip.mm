@@ -20,8 +20,6 @@ bool OpFlip::Forward(Tensor& src, Tensor& dst)
         return false;
     }
 
-    Context::GetInstance().BeginCapture();
-
     [commandEncoder setComputePipelineState:computePipelineState];
 
     [commandEncoder setBuffer:src.GetRawBuffer() offset:0 atIndex:0];
@@ -41,8 +39,6 @@ bool OpFlip::Forward(Tensor& src, Tensor& dst)
         CUTE_LOG_ERROR("{}: commit failed", __func__);
         return false;
     }
-
-    Context::GetInstance().EndCapture();
 
     return true;
 }
