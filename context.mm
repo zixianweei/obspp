@@ -84,10 +84,10 @@ typedef NSMutableArray<id<MTLCommandBuffer>>* CommandBufferArray;
 
     if (_device != nil) {
         _hasSimdGroupReduction = [_device supportsFamily:MTLGPUFamilyApple7];
-        _hasSimdGroupReduction |= [_device supportsFamily:MTLGPUFamilyMetal3];
+        // _hasSimdGroupReduction |= [_device supportsFamily:MTLGPUFamilyMetal3];
 
         _hasBFloat = [_device supportsFamily:MTLGPUFamilyApple6];
-        _hasBFloat |= [_device supportsFamily:MTLGPUFamilyMetal3];
+        // _hasBFloat |= [_device supportsFamily:MTLGPUFamilyMetal3];
     }
 
     if (_commandQueue == nil) {
