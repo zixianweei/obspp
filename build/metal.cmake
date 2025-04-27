@@ -1,6 +1,6 @@
 # Reference:
 # https://developer.apple.com/documentation/metal/building-a-shader-library-by-precompiling-source-files?language=objc
-# 
+# https://github.com/pytorch/pytorch/blob/main/cmake/Metal.cmake
 
 if (NOT APPLE)
     return()
@@ -29,5 +29,3 @@ function(cute_air_to_metallib TGT OBJS)
         COMMENT "Linking ${TGT}"
         VERBATIM)
 endfunction()
-
-

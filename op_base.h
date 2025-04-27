@@ -3,6 +3,9 @@
 
 #include <string>
 
+#include "macros.h"
+#include "tensor.h"
+
 namespace cute {
 
 class Tensor;
@@ -12,6 +15,7 @@ class OpBase
 public:
     virtual bool Forward(Tensor& src, Tensor& dst) = 0;
     virtual std::string GetKernelName() const = 0;
+    MTLBufferPtr AllocateTensorProperty(const Tensor& src, const Tensor& dst);
 };
 
 }  // namespace cute

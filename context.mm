@@ -5,7 +5,7 @@
 #include <mach-o/dyld.h>
 #include <mach-o/getsect.h>
 
-#include "logger.h"
+#include "base/logger.h"
 #include "macros.h"
 
 static dispatch_data_t find_section_data(const std::string& section_name)

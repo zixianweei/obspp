@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.28)
 project(cute)
 
+find_library(FOUNDATION_LIBRARY Foundation REQUIRED)
+find_library(METAL_FRAMEWORK Metal REQUIRED)
+find_library(METALKIT_FRAMEWORK MetalKit REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+
 # for metal shaders
-include(cmake/metal.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build/metal.cmake)
 file(GLOB_RECURSE CUTE_METAL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/shader/*.metal")
 message(STATUS "CUTE_METAL_SHADERS: ${CUTE_METAL_SHADERS}")
 foreach(CUTE_METAL_SHADER ${CUTE_METAL_SHADERS})
@@ -11,8 +16,8 @@ foreach(CUTE_METAL_SHADER ${CUTE_METAL_SHADERS})
     string(CONCAT TGT_BFLOAT ${TGT_STEM} "_31.air")
     list(APPEND AIR_BASIC ${TGT_BASIC})
     list(APPEND AIR_BFLOAT ${TGT_BFLOAT})
-    cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BASIC} "-std=metal3.0")
-    cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BFLOAT} "-std=metal3.1")
+    cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BASIC} "")
+    cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BFLOAT} "")
 endforeach()
 cute_air_to_metallib(kernels_basic.metallib ${AIR_BASIC})
 cute_air_to_metallib(kernels_bfloat.metallib ${AIR_BFLOAT})
@@ -24,8 +29,6 @@ add_custom_command(
 )
 add_custom_target(${PROJECT_NAME}_metallib DEPENDS kernels_basic.metallib kernels_bfloat.metallib metallib_dummy.cpp)
 set(CUTE_METALLIB_BINARY_DIR ${CMAKE_BINARY_DIR}/cute)
-
-find_package(spdlog CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME} MACOSX_BUNDLE)
 set_target_properties(
@@ -84,8 +87,8 @@ target_sources(
     op_base.h
     op_flip.mm
     op_flip.h
-    logger.cpp
-    logger.h
+    base/logger.cpp
+    base/logger.h
 )
 
 target_link_directories(
