@@ -1,5 +1,5 @@
-#ifndef CUTE_LOGGER_H_
-#define CUTE_LOGGER_H_
+#ifndef CUTE_BASE_LOGGER_H_
+#define CUTE_BASE_LOGGER_H_
 
 #if defined(HAS_CUTE_LOGGER)
 
@@ -50,4 +50,4 @@ private:
 
 #endif
 
-#endif  // !CUTE_LOGGER_H_
+#endif  // !CUTE_BASE_LOGGER_H_

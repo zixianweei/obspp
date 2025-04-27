@@ -50,6 +50,12 @@ target_compile_options(
     -fsanitize=address
 )
 
+target_include_directories(
+    ${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 target_link_options(
     ${PROJECT_NAME}
     PRIVATE
@@ -89,6 +95,9 @@ target_sources(
     op_flip.h
     base/logger.cpp
     base/logger.h
+    # nn/net.hpp
+    # nn/softmax_cpu.cpp
+    # nn/softmax.hpp
 )
 
 target_link_directories(
