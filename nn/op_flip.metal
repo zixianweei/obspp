@@ -1,17 +1,14 @@
 #include <metal_stdlib>
-#include "nn/property.h"
+#include "nn/types.hpp"
 using namespace metal;
 
 kernel void kernel_flip(
     const device float* input [[buffer(0)]],
     device float* output [[buffer(1)]],
-    constant cutenn::TensorProperty& property [[buffer(2)]],
+    constant cutenn::OpFlipAttribute& attribute [[buffer(2)]],
     uint3 gid [[thread_position_in_grid]]
 ) {
-    auto outptr = output + (property.o_h - 1 - gid.y) * property.o_w * property.o_c + (gid.x) * property.o_c;
-    auto inptr = input + (gid.y) * property.i_w * property.i_c + (gid.x) * property.i_c;
-
-    *outptr = *inptr;
-    //*(outptr + 1) = *(inptr + 1);
-    //*(outptr + 2) = *(inptr + 2);
+    uint i_idx = attribute.i_w * gid.y + gid.x;
+    uint o_idx = attribute.o_w * gid.y + gid.x;
+    output[o_idx] = input[i_idx];
 }

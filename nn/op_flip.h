@@ -5,10 +5,11 @@
 
 namespace cutenn {
 
-class OpFlip : public OpBase {
+class OpFlip final : public OpBase {
 public:
   bool Forward(Tensor &src, Tensor &dst) override;
   std::string GetKernelName() const override;
+  MTLBufferPtr MakeAttribute(Tensor &src, Tensor &dst) override;
 };
 
 } // namespace cutenn

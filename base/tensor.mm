@@ -182,6 +182,8 @@ bool Tensor::Download(void *data, const TShape &shape, Format format) {
 
 TShape Tensor::GetShape() const { return [impl_ shape]; }
 
+size_t Tensor::GetDims() const { return [impl_ shape].size(); }
+
 MTLBufferPtr Tensor::GetRawBuffer() { return [impl_ buffer]; }
 
 } // namespace cutenn

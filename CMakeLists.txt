@@ -93,6 +93,7 @@ target_sources(
     nn/op_softmax_unittest.cpp
     nn/op_softmax.cpp
     nn/op_softmax.hpp
+    nn/types.hpp
     testing/cutenn_test_main.cpp
 )
 

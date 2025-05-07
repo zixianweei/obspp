@@ -26,6 +26,7 @@ public:
                 Format format = Format::kFloat32);
 
   TShape GetShape() const;
+  size_t GetDims() const;
   MTLBufferPtr GetRawBuffer();
 
 private:

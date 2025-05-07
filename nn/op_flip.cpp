@@ -3,10 +3,15 @@
 #include "base/context.hpp"
 #include "base/logger.hpp"
 #include "base/tensor.hpp"
+#include "nn/types.hpp"
 
 namespace cutenn {
 
 bool OpFlip::Forward(Tensor &src, Tensor &dst) {
+  CUTENN_CHECK(src.GetDims() == dst.GetDims(),
+               "{}: src and dst must have the same dims", __func__)
+  CUTENN_CHECK(src.GetDims() == 2, "{}: src and dst must have 2 dims", __func__)
+
   MTLComputeCommandEncoderPtr commandEncoder =
       Context::GetInstance().GetCommandEncoder();
   if (commandEncoder == nullptr) {
@@ -28,8 +33,8 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
                                                  src.GetRawBuffer(), 0, 0);
   Context::GetInstance().SetCommandEncoderBuffer(commandEncoder,
                                                  dst.GetRawBuffer(), 0, 1);
-  Context::GetInstance().SetCommandEncoderBuffer(
-      commandEncoder, OpBase::AllocateTensorProperty(src, dst), 0, 2);
+  Context::GetInstance().SetCommandEncoderBuffer(commandEncoder,
+                                                 MakeAttribute(src, dst), 0, 2);
 
   unsigned int maxTotalThreadsPerThreadgroup =
       Context::GetInstance().GetMaxTotalThreadsPerThreadgroup(
@@ -42,7 +47,7 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
 
   Size threadsPerThreadgroup =
       MakeSize(threadExecutionWidth, threadExecutionHeight, 1);
-  Size threads = MakeSize(src.GetShape()[3], src.GetShape()[2], 1);
+  Size threads = MakeSize(src.GetShape()[1], src.GetShape()[0], 1);
 
   Context::GetInstance().DispatchThreads(commandEncoder, threads,
                                          threadsPerThreadgroup);
@@ -57,5 +62,14 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
 }
 
 std::string OpFlip::GetKernelName() const { return "kernel_flip"; }
+
+MTLBufferPtr OpFlip::MakeAttribute(Tensor &src, Tensor &dst) {
+  OpFlipAttribute attribute;
+  attribute.i_h = src.GetShape()[1];
+  attribute.i_w = src.GetShape()[0];
+  attribute.o_h = dst.GetShape()[1];
+  attribute.o_w = dst.GetShape()[0];
+  return Context::GetInstance().MakeBuffer(&attribute, sizeof(OpFlipAttribute));
+}
 
 } // namespace cutenn

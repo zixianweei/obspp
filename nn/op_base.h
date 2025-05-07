@@ -3,8 +3,7 @@
 
 #include <string>
 
-#include "base/macros.hpp"
-#include "base/tensor.hpp"
+#include "base/types.hpp"
 
 namespace cutenn {
 
@@ -14,7 +13,7 @@ class OpBase {
 public:
   virtual bool Forward(Tensor &src, Tensor &dst) = 0;
   virtual std::string GetKernelName() const = 0;
-  MTLBufferPtr AllocateTensorProperty(const Tensor &src, const Tensor &dst);
+  virtual MTLBufferPtr MakeAttribute(Tensor &src, Tensor &dst) = 0;
 };
 
 } // namespace cutenn
