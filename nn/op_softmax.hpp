@@ -1,0 +1,4 @@
+#ifndef CUTENN_OP_SOFTMAX_HPP_
+#define CUTENN_OP_SOFTMAX_HPP_
+
+#endif // !CUTENN_OP_SOFTMAX_HPP_

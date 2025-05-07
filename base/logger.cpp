@@ -1,17 +1,18 @@
 #include "logger.hpp"
 
-#if defined(ENABLE_CUTE_LOGGER)
+#if defined(ENABLE_CUTENN_LOGGER)
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-CuteLogger &CuteLogger::GetInstance() {
-  static CuteLogger instance;
+namespace cutenn {
+
+Logger &Logger::GetInstance() {
+  static Logger instance;
   return instance;
 }
 
-bool CuteLogger::Init(const std::string &fname, size_t max_size,
-                      size_t max_files) {
+bool Logger::Init(const std::string &fname, size_t max_size, size_t max_files) {
   try {
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     console_sink->set_level(spdlog::level::debug);
@@ -32,5 +33,7 @@ bool CuteLogger::Init(const std::string &fname, size_t max_size,
     return false;
   }
 }
+
+} // namespace cutenn
 
 #endif

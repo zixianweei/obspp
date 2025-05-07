@@ -1,13 +1,16 @@
 cmake_minimum_required(VERSION 3.28)
 project(cutenn)
 
-option(ENABLE_CUTE_LOGGER "Enable cute logger" ON)
+option(ENABLE_CUTENN_LOGGER "Enable cute logger" ON)
 
 find_library(FOUNDATION_LIBRARY Foundation REQUIRED)
 find_library(METAL_FRAMEWORK Metal REQUIRED)
 find_library(METALKIT_FRAMEWORK MetalKit REQUIRED)
 
+include(CTest)
+include(GoogleTest)
 enable_testing()
+
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
@@ -46,7 +49,8 @@ set_target_properties(
 target_compile_definitions(
     ${PROJECT_NAME}
     PRIVATE
-    ENABLE_CUTE_LOGGER
+    ENABLE_CUTENN_LOGGER
+    CUTENN_DEBUG
 )
 
 target_compile_options(
@@ -67,12 +71,6 @@ target_link_options(
     -fsanitize=address
     -Wl,-sectcreate,__TEXT,metal_basic,${CUTE_METALLIB_BINARY_DIR}/kernels_basic.metallib
     -Wl,-sectcreate,__TEXT,metal_bfloat,${CUTE_METALLIB_BINARY_DIR}/kernels_bfloat.metallib
-)
-
-target_compile_definitions(
-    ${PROJECT_NAME}
-    PRIVATE
-    CUTE_DEBUG
 )
 
 target_link_libraries(
@@ -102,5 +100,11 @@ target_sources(
     nn/op_base.h
     nn/op_flip.mm
     nn/op_flip.h
+    nn/op_softmax_unittest.cpp
+    nn/op_softmax.cpp
+    nn/op_softmax.hpp
+    nn/op_softmax.mm
     testing/cutenn_test_main.cpp
 )
+
+gtest_add_tests(TARGET ${PROJECT_NAME})

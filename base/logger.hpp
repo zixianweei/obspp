@@ -1,21 +1,23 @@
 #ifndef CUTENN_BASE_LOGGER_H_
 #define CUTENN_BASE_LOGGER_H_
 
-#if defined(ENABLE_CUTE_LOGGER)
+#if defined(ENABLE_CUTENN_LOGGER)
 
 #include <memory>
 #include <string>
 
 #include <spdlog/logger.h>
 
-class CuteLogger {
-public:
-  static CuteLogger &GetInstance();
+namespace cutenn {
 
-  CuteLogger(const CuteLogger &) = delete;
-  CuteLogger &operator=(const CuteLogger &) = delete;
-  CuteLogger(CuteLogger &&) noexcept = delete;
-  CuteLogger &operator=(CuteLogger &&) noexcept = delete;
+class Logger {
+public:
+  static Logger &GetInstance();
+
+  Logger(const Logger &) = delete;
+  Logger &operator=(const Logger &) = delete;
+  Logger(Logger &&) noexcept = delete;
+  Logger &operator=(Logger &&) noexcept = delete;
 
   bool Init(const std::string &fname, size_t max_size = 1024 * 1024 * 10,
             size_t max_files = 10);
@@ -23,12 +25,14 @@ public:
   std::shared_ptr<spdlog::logger> GetLogger() { return logger_; }
 
 private:
-  CuteLogger() = default;
+  Logger() = default;
 
   std::shared_ptr<spdlog::logger> logger_;
 };
 
-#define CUTENN_LOG_INSTANCE_LOGGER() CuteLogger::GetInstance().GetLogger()
+} // namespace cutenn
+
+#define CUTENN_LOG_INSTANCE_LOGGER() cutenn::Logger::GetInstance().GetLogger()
 #define CUTENN_LOG_TRACE(...) CUTENN_LOG_INSTANCE_LOGGER()->trace(__VA_ARGS__)
 #define CUTENN_LOG_DEBUG(...) CUTENN_LOG_INSTANCE_LOGGER()->debug(__VA_ARGS__)
 #define CUTENN_LOG_INFO(...) CUTENN_LOG_INSTANCE_LOGGER()->info(__VA_ARGS__)
@@ -46,6 +50,6 @@ private:
 #define CUTENN_LOG_ERROR(...)
 #define CUTENN_LOG_CRITICAL(...)
 
-#endif // ENABLE_CUTE_LOGGER
+#endif // ENABLE_CUTENN_LOGGER
 
 #endif // !CUTENN_BASE_LOGGER_H_
