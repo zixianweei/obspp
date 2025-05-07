@@ -1,12 +1,12 @@
-#ifndef CUTE_OP_BASE_H_
-#define CUTE_OP_BASE_H_
+#ifndef CUTENN_NN_OP_BASE_H_
+#define CUTENN_NN_OP_BASE_H_
 
 #include <string>
 
 #include "base/macros.hpp"
 #include "base/tensor.hpp"
 
-namespace cute {
+namespace cutenn {
 
 class Tensor;
 
@@ -17,6 +17,6 @@ public:
   MTLBufferPtr AllocateTensorProperty(const Tensor &src, const Tensor &dst);
 };
 
-} // namespace cute
+} // namespace cutenn
 
-#endif // !CUTE_OP_BASE_H_
+#endif // !CUTENN_NN_OP_BASE_H_

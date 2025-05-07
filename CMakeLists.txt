@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(cutenn)
-
-option(ENABLE_CUTENN_LOGGER "Enable cute logger" ON)
+project(CuteNN)
 
 find_library(FOUNDATION_LIBRARY Foundation REQUIRED)
 find_library(METAL_FRAMEWORK Metal REQUIRED)
@@ -21,21 +19,11 @@ message(STATUS "CUTE_METAL_SHADERS: ${CUTE_METAL_SHADERS}")
 foreach(CUTE_METAL_SHADER ${CUTE_METAL_SHADERS})
     cmake_path(GET CUTE_METAL_SHADER STEM TGT_STEM)
     string(CONCAT TGT_BASIC ${TGT_STEM} "_30.air")
-    string(CONCAT TGT_BFLOAT ${TGT_STEM} "_31.air")
     list(APPEND AIR_BASIC ${TGT_BASIC})
-    list(APPEND AIR_BFLOAT ${TGT_BFLOAT})
     cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BASIC} "")
-    cute_metal_to_air(${CUTE_METAL_SHADER} ${TGT_BFLOAT} "")
 endforeach()
-cute_air_to_metallib(kernels_basic.metallib ${AIR_BASIC})
-cute_air_to_metallib(kernels_bfloat.metallib ${AIR_BFLOAT})
-add_custom_command(
-    COMMAND echo "// $$(date)" > metallib_dummy.cpp
-    DEPENDS kernels_basic.metallib kernels_bfloat.metallib
-    OUTPUT metallib_dummy.cpp
-    COMMENT "Updating metallibs timestamp"
-)
-add_custom_target(${PROJECT_NAME}_metallib DEPENDS kernels_basic.metallib kernels_bfloat.metallib metallib_dummy.cpp)
+cute_air_to_metallib(kernels.metallib ${AIR_BASIC})
+add_custom_target(${PROJECT_NAME}_metallib DEPENDS kernels.metallib)
 set(CUTE_METALLIB_BINARY_DIR ${CMAKE_BINARY_DIR})
 
 add_executable(${PROJECT_NAME})
@@ -49,8 +37,9 @@ set_target_properties(
 target_compile_definitions(
     ${PROJECT_NAME}
     PRIVATE
-    ENABLE_CUTENN_LOGGER
     CUTENN_DEBUG
+    HAVE_CPUONLY
+    HAVE_METAL
 )
 
 target_compile_options(
@@ -96,6 +85,7 @@ target_sources(
     base/macros.hpp
     base/tensor.hpp
     base/tensor.mm
+    base/types.hpp
     nn/op_base.mm
     nn/op_base.h
     nn/op_flip.mm
@@ -103,7 +93,6 @@ target_sources(
     nn/op_softmax_unittest.cpp
     nn/op_softmax.cpp
     nn/op_softmax.hpp
-    nn/op_softmax.mm
     testing/cutenn_test_main.cpp
 )
 

@@ -1,17 +1,16 @@
-#ifndef CUTE_OP_FLIP_H_
-#define CUTE_OP_FLIP_H_
+#ifndef CUTENN_NN_OP_FLIP_H_
+#define CUTENN_NN_OP_FLIP_H_
 
 #include "op_base.h"
 
-namespace cute {
+namespace cutenn {
 
-class OpFlip : public OpBase
-{
+class OpFlip : public OpBase {
 public:
-    bool Forward(Tensor& src, Tensor& dst) override;
-    std::string GetKernelName() const override;
+  bool Forward(Tensor &src, Tensor &dst) override;
+  std::string GetKernelName() const override;
 };
 
-}  // namespace cute
+} // namespace cutenn
 
-#endif  // !CUTE_OP_FLIP_H_
+#endif // !CUTENN_NN_OP_FLIP_H_

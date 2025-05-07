@@ -11,7 +11,7 @@ static dispatch_data_t find_section_data(const std::string &section_name) {
   uint32_t image_idx = 0U;
   uint32_t image_count = _dyld_image_count();
   for (uint32_t i = 0; i < image_count; i++) {
-    if (strstr(_dyld_get_image_name(i), "/cute")) {
+    if (strstr(_dyld_get_image_name(i), "/cutenn")) {
       image_idx = i;
       break;
     }
@@ -193,7 +193,7 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
 
 @end
 
-namespace cute {
+namespace cutenn {
 
 // static
 Context &Context::GetInstance() {
@@ -225,4 +225,4 @@ MTLComputeCommandEncoderPtr Context::GetCommandEncoder() {
 
 bool Context::Commit() { return [impl_ commit]; }
 
-} // namespace cute
+} // namespace cutenn

@@ -1,46 +1,45 @@
-#ifndef CUTE_TENSOR_H_
-#define CUTE_TENSOR_H_
+#ifndef CUTENN_BASE_TENSOR_H_
+#define CUTENN_BASE_TENSOR_H_
 
 #include <vector>
 
 #include "base/macros.hpp"
-
-CUTENN_OBJC_FORWARD_DECLARATION(CuteTensorImpl);
+#include "base/types.hpp"
 
 #ifdef __OBJC__
 #include <Foundation/Foundation.h>
 #include <Metal/Metal.h>
 #endif
 
+CUTENN_OBJC_FORWARD_DECLARATION(TensorImpl);
 CUTENN_TYPE_ALIAS(id<MTLBuffer>, MTLBufferPtr);
 
-namespace cute {
-
-enum class Format {
-  kUnknown,
-  kUnsignedChar8,
-  kFloat32,
-};
+namespace cutenn {
 
 class Tensor {
 public:
-  Tensor();
+  Tensor(Format format = Format::kFloat32);
+  Tensor(const void *data, const TShape &shape,
+         Format format = Format::kFloat32);
   ~Tensor();
 
-  Tensor(const Tensor &) = delete;
-  Tensor &operator=(const Tensor &) = delete;
+  Tensor(const Tensor &rhs);
+  Tensor &operator=(const Tensor &rhs);
+  Tensor(Tensor &&rhs) noexcept;
+  Tensor &operator=(Tensor &&rhs) noexcept;
 
+  bool Upload(const void *data, const TShape &shape,
+              Format format = Format::kFloat32);
+  bool Download(void *data, const TShape &shape,
+                Format format = Format::kFloat32);
+
+  TShape GetShape() const;
   MTLBufferPtr GetRawBuffer();
-  bool fromBytes(const void *data, const std::vector<int> &shape,
-                 Format format);
-  bool toBytes(void **data, const std::vector<int> &shape, Format format);
-
-  std::vector<int> Shape() const;
 
 private:
-  CuteTensorImpl *impl_;
+  TensorImpl *impl_;
 };
 
-} // namespace cute
+} // namespace cutenn
 
-#endif // !CUTE_TENSOR_H_
+#endif // !CUTENN_BASE_TENSOR_H_

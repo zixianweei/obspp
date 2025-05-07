@@ -1,5 +1,5 @@
-#ifndef CUTE_CONTEXT_H_
-#define CUTE_CONTEXT_H_
+#ifndef CUTENN_BASE_CONTEXT_H_
+#define CUTENN_BASE_CONTEXT_H_
 
 #include <string>
 
@@ -17,7 +17,7 @@ CUTENN_TYPE_ALIAS(id<MTLCommandQueue>, MTLCommandQueuePtr);
 CUTENN_TYPE_ALIAS(id<MTLComputePipelineState>, MTLComputePipelineStatePtr);
 CUTENN_TYPE_ALIAS(id<MTLComputeCommandEncoder>, MTLComputeCommandEncoderPtr);
 
-namespace cute {
+namespace cutenn {
 
 class Context {
   struct Impl;
@@ -44,6 +44,6 @@ private:
   CuteContextImpl *impl_;
 };
 
-} // namespace cute
+} // namespace cutenn
 
-#endif // !CUTE_CONTEXT_H_
+#endif // !CUTENN_BASE_CONTEXT_H_

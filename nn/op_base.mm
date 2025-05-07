@@ -4,19 +4,19 @@
 #include "base/logger.hpp"
 #include "property.h"
 
-namespace cute {
+namespace cutenn {
 
 MTLBufferPtr OpBase::AllocateTensorProperty(const Tensor &src,
                                             const Tensor &dst) {
   TensorProperty property;
-  property.i_n = src.Shape()[0];
-  property.i_c = src.Shape()[1];
-  property.i_h = src.Shape()[2];
-  property.i_w = src.Shape()[3];
-  property.o_n = dst.Shape()[0];
-  property.o_c = dst.Shape()[1];
-  property.o_h = dst.Shape()[2];
-  property.o_w = dst.Shape()[3];
+  property.i_n = src.GetShape()[0];
+  property.i_c = src.GetShape()[1];
+  property.i_h = src.GetShape()[2];
+  property.i_w = src.GetShape()[3];
+  property.o_n = dst.GetShape()[0];
+  property.o_c = dst.GetShape()[1];
+  property.o_h = dst.GetShape()[2];
+  property.o_w = dst.GetShape()[3];
 
   MTLBufferPtr property_buffer = [Context::GetInstance().GetDevice()
       newBufferWithBytes:(const void *)(&property)
@@ -29,4 +29,4 @@ MTLBufferPtr OpBase::AllocateTensorProperty(const Tensor &src,
   return property_buffer;
 }
 
-} // namespace cute
+} // namespace cutenn

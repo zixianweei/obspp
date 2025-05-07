@@ -4,7 +4,7 @@
 #include "base/logger.hpp"
 #include "base/tensor.hpp"
 
-namespace cute {
+namespace cutenn {
 
 bool OpFlip::Forward(Tensor &src, Tensor &dst) {
   MTLComputeCommandEncoderPtr commandEncoder =
@@ -37,7 +37,7 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
 
   MTLSize threadPerThreadgroup =
       MTLSizeMake(threadExecutionWidth, threadExecutionHeight, 1);
-  MTLSize threads = MTLSizeMake(src.Shape()[3], src.Shape()[2], 1);
+  MTLSize threads = MTLSizeMake(src.GetShape()[3], src.GetShape()[2], 1);
 
   [commandEncoder dispatchThreads:threads
             threadsPerThreadgroup:threadPerThreadgroup];
@@ -53,4 +53,4 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
 
 std::string OpFlip::GetKernelName() const { return "kernel_flip"; }
 
-} // namespace cute
+} // namespace cutenn

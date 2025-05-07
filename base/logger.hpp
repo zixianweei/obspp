@@ -1,8 +1,6 @@
 #ifndef CUTENN_BASE_LOGGER_H_
 #define CUTENN_BASE_LOGGER_H_
 
-#if defined(ENABLE_CUTENN_LOGGER)
-
 #include <memory>
 #include <string>
 
@@ -40,16 +38,5 @@ private:
 #define CUTENN_LOG_ERROR(...) CUTENN_LOG_INSTANCE_LOGGER()->error(__VA_ARGS__)
 #define CUTENN_LOG_CRITICAL(...)                                               \
   CUTENN_LOG_INSTANCE_LOGGER()->critical(__VA_ARGS__)
-
-#else
-
-#define CUTENN_LOG_TRACE(...)
-#define CUTENN_LOG_DEBUG(...)
-#define CUTENN_LOG_INFO(...)
-#define CUTENN_LOG_WARN(...)
-#define CUTENN_LOG_ERROR(...)
-#define CUTENN_LOG_CRITICAL(...)
-
-#endif // ENABLE_CUTENN_LOGGER
 
 #endif // !CUTENN_BASE_LOGGER_H_

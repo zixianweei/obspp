@@ -1,7 +1,5 @@
 #include "logger.hpp"
 
-#if defined(ENABLE_CUTENN_LOGGER)
-
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -35,5 +33,3 @@ bool Logger::Init(const std::string &fname, size_t max_size, size_t max_files) {
 }
 
 } // namespace cutenn
-
-#endif
