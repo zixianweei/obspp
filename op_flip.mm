@@ -10,14 +10,14 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
   MTLComputeCommandEncoderPtr commandEncoder =
       Context::GetInstance().GetCommandEncoder();
   if (commandEncoder == nil) {
-    CUTE_LOG_ERROR("{}: command encoder is nil", __func__);
+    CUTENN_LOG_ERROR("{}: command encoder is nil", __func__);
     return false;
   }
 
   MTLComputePipelineStatePtr computePipelineState =
       Context::GetInstance().findComputePipelineState(GetKernelName());
   if (computePipelineState == nil) {
-    CUTE_LOG_ERROR("{}: compute pipeline state is nil");
+    CUTENN_LOG_ERROR("{}: compute pipeline state is nil");
     return false;
   }
 
@@ -44,7 +44,7 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
   [commandEncoder endEncoding];
 
   if (!Context::GetInstance().Commit()) {
-    CUTE_LOG_ERROR("{}: commit failed", __func__);
+    CUTENN_LOG_ERROR("{}: commit failed", __func__);
     return false;
   }
 

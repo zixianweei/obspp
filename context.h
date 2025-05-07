@@ -4,48 +4,47 @@
 #include <string>
 #include <vector>
 
-#include "macros.h"
+#include "base/macros.hpp"
 
-CUTE_OBJC_FORWARD_DECLARATION(CuteContextImpl);
+CUTENN_OBJC_FORWARD_DECLARATION(CuteContextImpl);
 
 #ifdef __OBJC__
 #include <Foundation/Foundation.h>
 #include <Metal/Metal.h>
 #endif
 
-CUTE_TYPE_ALIAS(id<MTLDevice>, MTLDevicePtr);
-CUTE_TYPE_ALIAS(id<MTLCommandQueue>, MTLCommandQueuePtr);
-CUTE_TYPE_ALIAS(id<MTLComputePipelineState>, MTLComputePipelineStatePtr);
-CUTE_TYPE_ALIAS(id<MTLComputeCommandEncoder>, MTLComputeCommandEncoderPtr);
+CUTENN_TYPE_ALIAS(id<MTLDevice>, MTLDevicePtr);
+CUTENN_TYPE_ALIAS(id<MTLCommandQueue>, MTLCommandQueuePtr);
+CUTENN_TYPE_ALIAS(id<MTLComputePipelineState>, MTLComputePipelineStatePtr);
+CUTENN_TYPE_ALIAS(id<MTLComputeCommandEncoder>, MTLComputeCommandEncoderPtr);
 
 namespace cute {
 
-class Context
-{
-    struct Impl;
+class Context {
+  struct Impl;
 
 public:
-    static Context& GetInstance();
-    
-    ~Context();
+  static Context &GetInstance();
 
-    Context(const Context&) = delete;
-    Context& operator=(const Context&) = delete;
-    Context(Context&&) noexcept = delete;
-    Context& operator=(Context&&) noexcept = delete;
+  ~Context();
 
-    MTLDevicePtr GetDevice();
-    MTLCommandQueuePtr GetCommandQueue();
-    MTLComputePipelineStatePtr findComputePipelineState(const std::string& kname);
-    MTLComputeCommandEncoderPtr GetCommandEncoder();
-    bool Commit();
+  Context(const Context &) = delete;
+  Context &operator=(const Context &) = delete;
+  Context(Context &&) noexcept = delete;
+  Context &operator=(Context &&) noexcept = delete;
+
+  MTLDevicePtr GetDevice();
+  MTLCommandQueuePtr GetCommandQueue();
+  MTLComputePipelineStatePtr findComputePipelineState(const std::string &kname);
+  MTLComputeCommandEncoderPtr GetCommandEncoder();
+  bool Commit();
 
 private:
-    Context();
+  Context();
 
-    CuteContextImpl* impl_;
+  CuteContextImpl *impl_;
 };
 
-}  // namespace cute
+} // namespace cute
 
-#endif  // !CUTE_CONTEXT_H_
+#endif // !CUTE_CONTEXT_H_

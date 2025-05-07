@@ -1,0 +1,103 @@
+{
+    "version": 8,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 28,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/out",
+            "installDir": "${sourceDir}/out/install/${presetName}",
+            "environment": {
+                "VCPKG_FEATURE_FLAGS": "manifests,versions,binarycaching,registries",
+                "OPENCV_VULKAN_RUNTIME": "/opt/homebrew/lib/libMoltenVK.dylib"
+            },
+            "cacheVariables": {
+                "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+            }
+        },
+        {
+            "name": "macos",
+            "displayName": "macOS",
+            "description": "",
+            "inherits": "default",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "generator": "Ninja",
+            "environment": {
+                "VCPKG_ROOT": "$env{HOME}/.vcpkg"
+            }
+        },
+        {
+            "name": "macos_debug",
+            "displayName": "Debug",
+            "description": "",
+            "inherits": "macos",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "macos_release",
+            "displayName": "Release",
+            "description": "",
+            "inherits": "macos",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "macos_relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "description": "",
+            "inherits": "macos",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "macos_minsizerel",
+            "displayName": "MinSizeRel",
+            "description": "",
+            "inherits": "macos",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "macos_debug",
+            "configurePreset": "macos_debug",
+            "displayName": "Debug",
+            "description": ""
+        },
+        {
+            "name": "macos_release",
+            "configurePreset": "macos_release",
+            "displayName": "Release",
+            "description": ""
+        },
+        {
+            "name": "macos_relwithdebinfo",
+            "configurePreset": "macos_relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "description": ""
+        },
+        {
+            "name": "macos_minsizerel",
+            "configurePreset": "macos_minsizerel",
+            "displayName": "MinSizeRel",
+            "description": ""
+        }
+    ]
+}

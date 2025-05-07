@@ -28,7 +28,7 @@ add_custom_command(
     COMMENT "Updating metallibs timestamp"
 )
 add_custom_target(${PROJECT_NAME}_metallib DEPENDS kernels_basic.metallib kernels_bfloat.metallib metallib_dummy.cpp)
-set(CUTE_METALLIB_BINARY_DIR ${CMAKE_BINARY_DIR}/cute)
+set(CUTE_METALLIB_BINARY_DIR ${CMAKE_BINARY_DIR})
 
 add_executable(${PROJECT_NAME} MACOSX_BUNDLE)
 set_target_properties(
@@ -99,30 +99,3 @@ target_sources(
     # nn/softmax_cpu.cpp
     # nn/softmax.hpp
 )
-
-target_link_directories(
-    ${PROJECT_NAME}
-    PRIVATE
-    ${CMAKE_BINARY_DIR}/opencv/lib
-)
-
-function(cv_target_add module)
-    target_include_directories(
-        ${PROJECT_NAME}
-        PRIVATE
-        ${CMAKE_SOURCE_DIR}/opencv/modules/${module}/include
-    )
-    target_link_libraries(
-        ${PROJECT_NAME}
-        PRIVATE
-        opencv_${module}
-    )
-endfunction()
-
-cv_target_add(core)
-cv_target_add(dnn)
-cv_target_add(imgproc)
-cv_target_add(highgui)
-cv_target_add(imgcodecs)
-cv_target_add(videoio)
-cv_target_add(video)

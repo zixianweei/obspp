@@ -1,4 +1,5 @@
 #include <metal_stdlib>
+#include "../property.h"
 using namespace metal;
 
 kernel void kernel_grayscale(

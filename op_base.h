@@ -3,21 +3,20 @@
 
 #include <string>
 
-#include "macros.h"
+#include "base/macros.hpp"
 #include "tensor.h"
 
 namespace cute {
 
 class Tensor;
 
-class OpBase
-{
+class OpBase {
 public:
-    virtual bool Forward(Tensor& src, Tensor& dst) = 0;
-    virtual std::string GetKernelName() const = 0;
-    MTLBufferPtr AllocateTensorProperty(const Tensor& src, const Tensor& dst);
+  virtual bool Forward(Tensor &src, Tensor &dst) = 0;
+  virtual std::string GetKernelName() const = 0;
+  MTLBufferPtr AllocateTensorProperty(const Tensor &src, const Tensor &dst);
 };
 
-}  // namespace cute
+} // namespace cute
 
-#endif  // !CUTE_OP_BASE_H_
+#endif // !CUTE_OP_BASE_H_

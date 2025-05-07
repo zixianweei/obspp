@@ -23,7 +23,7 @@ MTLBufferPtr OpBase::AllocateTensorProperty(const Tensor &src,
                   length:sizeof(TensorProperty)
                  options:MTLResourceCPUCacheModeWriteCombined];
   if (property_buffer == nil) {
-    CUTE_LOG_ERROR("{}: failed to allocate property buffer.", __func__);
+    CUTENN_LOG_ERROR("{}: failed to allocate property buffer.", __func__);
     return nil;
   }
   return property_buffer;
