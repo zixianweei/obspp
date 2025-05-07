@@ -1,11 +1,15 @@
 #ifndef CUTENN_BASE_MACROS_HPP_
 #define CUTENN_BASE_MACROS_HPP_
 
+#if !__has_feature(objc_arc)
 #define CUTENN_SAFE_RELEASE(__object__)                                        \
   if (__object__ != nil) {                                                     \
     [__object__ release];                                                      \
     __object__ = nil;                                                          \
   }
+#else
+#define CUTENN_SAFE_RELEASE(__object__) __object__ = nil
+#endif
 
 #ifdef __OBJC__
 #define CUTENN_OBJC_FORWARD_DECLARATION(__class__) @class __class__

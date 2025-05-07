@@ -1,5 +1,5 @@
 #include <metal_stdlib>
-#include "../property.h"
+#include "nn/property.h"
 using namespace metal;
 
 kernel void kernel_flip(

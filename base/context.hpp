@@ -2,7 +2,6 @@
 #define CUTE_CONTEXT_H_
 
 #include <string>
-#include <vector>
 
 #include "base/macros.hpp"
 

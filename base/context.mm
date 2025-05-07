@@ -1,11 +1,11 @@
-#include "context.h"
+#include "context.hpp"
 
 #include <string>
 
 #include <mach-o/dyld.h>
 #include <mach-o/getsect.h>
 
-#include "base/logger.h"
+#include "base/logger.hpp"
 
 static dispatch_data_t find_section_data(const std::string &section_name) {
   uint32_t image_idx = 0U;
@@ -49,9 +49,7 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
 @property(strong, nonatomic) id<MTLCommandBuffer> commandBuffer;
 @property(strong, nonatomic) CommandBufferArray schedCommandBuffer;
 
-#if !__has_feature(objc_arc)
 - (void)dealloc;
-#endif
 - (id<MTLComputePipelineState>)findComputePipelineState:(NSString *)kernelName;
 - (id<MTLComputeCommandEncoder>)createEncoder;
 - (BOOL)commit;
@@ -130,7 +128,6 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
   return self;
 }
 
-#if !__has_feature(objc_arc)
 - (void)dealloc {
   CUTENN_SAFE_RELEASE(_device);
   CUTENN_SAFE_RELEASE(_commandQueue);
@@ -141,7 +138,6 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
   CUTENN_SAFE_RELEASE(_schedCommandBuffer);
   [super dealloc];
 }
-#endif
 
 - (id<MTLComputePipelineState>)findComputePipelineState:(NSString *)kernelName {
   // INFO: kernelName is kernel_***

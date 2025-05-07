@@ -1,12 +1,12 @@
-#include "tensor.h"
+#include "tensor.hpp"
 
 #include <Foundation/Foundation.h>
 #include <Metal/Metal.h>
 
 #include <vector>
 
-#include "base/logger.h"
-#include "context.h"
+#include "base/context.hpp"
+#include "base/logger.hpp"
 
 @interface CuteTensorImpl : NSObject
 @property(strong, nonatomic) id<MTLBuffer> buffer;

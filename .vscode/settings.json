@@ -1,7 +1,16 @@
 {
-  "editor.formatOnSave": true,
-"editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
-"files.associations": {
-    "initializer_list": "cpp"
-}
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+    "C_Cpp.autoAddFileAssociations": false,
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/out",
+        "--header-insertion=never",
+        "--clang-tidy",
+        "--j=2",
+        "--background-index",
+        "--log=verbose"
+    ],
+    "gitlens.currentLine.enabled": false,
+    "gitlens.codeLens.authors.enabled": false,
+    "gitlens.codeLens.recentChange.enabled": false,
 }

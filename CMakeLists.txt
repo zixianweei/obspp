@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 3.28)
-project(cute)
+project(cutenn)
+
+option(ENABLE_CUTE_LOGGER "Enable cute logger" ON)
 
 find_library(FOUNDATION_LIBRARY Foundation REQUIRED)
 find_library(METAL_FRAMEWORK Metal REQUIRED)
 find_library(METALKIT_FRAMEWORK MetalKit REQUIRED)
+
+enable_testing()
+find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
 # for metal shaders
 include(${CMAKE_CURRENT_SOURCE_DIR}/build/metal.cmake)
-file(GLOB_RECURSE CUTE_METAL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/shader/*.metal")
+file(GLOB_RECURSE CUTE_METAL_SHADERS "${CMAKE_CURRENT_SOURCE_DIR}/nn/*.metal")
 message(STATUS "CUTE_METAL_SHADERS: ${CUTE_METAL_SHADERS}")
 foreach(CUTE_METAL_SHADER ${CUTE_METAL_SHADERS})
     cmake_path(GET CUTE_METAL_SHADER STEM TGT_STEM)
@@ -30,7 +35,7 @@ add_custom_command(
 add_custom_target(${PROJECT_NAME}_metallib DEPENDS kernels_basic.metallib kernels_bfloat.metallib metallib_dummy.cpp)
 set(CUTE_METALLIB_BINARY_DIR ${CMAKE_BINARY_DIR})
 
-add_executable(${PROJECT_NAME} MACOSX_BUNDLE)
+add_executable(${PROJECT_NAME})
 set_target_properties(
     ${PROJECT_NAME}
     PROPERTIES
@@ -41,7 +46,7 @@ set_target_properties(
 target_compile_definitions(
     ${PROJECT_NAME}
     PRIVATE
-    HAS_CUTE_LOGGER
+    ENABLE_CUTE_LOGGER
 )
 
 target_compile_options(
@@ -53,7 +58,7 @@ target_compile_options(
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}
 )
 
 target_link_options(
@@ -74,6 +79,8 @@ target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     spdlog::spdlog
+    GTest::gtest
+    GTest::gmock
     $<LINK_LIBRARY:FRAMEWORK,Foundation>
     $<LINK_LIBRARY:FRAMEWORK,Metal>
     $<LINK_LIBRARY:FRAMEWORK,QuartzCore>
@@ -84,18 +91,16 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_metallib)
 target_sources(
     ${PROJECT_NAME}
     PRIVATE
-    main.cpp
-    context.mm
-    context.h
-    tensor.mm
-    tensor.h
-    op_base.mm
-    op_base.h
-    op_flip.mm
-    op_flip.h
+    base/context.hpp
+    base/context.mm
     base/logger.cpp
-    base/logger.h
-    # nn/net.hpp
-    # nn/softmax_cpu.cpp
-    # nn/softmax.hpp
+    base/logger.hpp
+    base/macros.hpp
+    base/tensor.hpp
+    base/tensor.mm
+    nn/op_base.mm
+    nn/op_base.h
+    nn/op_flip.mm
+    nn/op_flip.h
+    testing/cutenn_test_main.cpp
 )

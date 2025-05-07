@@ -1,7 +1,7 @@
 #ifndef CUTENN_BASE_LOGGER_H_
 #define CUTENN_BASE_LOGGER_H_
 
-#if defined(HAS_CUTE_LOGGER)
+#if defined(ENABLE_CUTE_LOGGER)
 
 #include <memory>
 #include <string>
@@ -46,6 +46,6 @@ private:
 #define CUTENN_LOG_ERROR(...)
 #define CUTENN_LOG_CRITICAL(...)
 
-#endif // HAS_CUTE_LOGGER
+#endif // ENABLE_CUTE_LOGGER
 
 #endif // !CUTENN_BASE_LOGGER_H_

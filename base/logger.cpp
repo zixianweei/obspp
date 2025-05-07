@@ -1,6 +1,6 @@
-#include "logger.h"
+#include "logger.hpp"
 
-#if defined(HAS_CUTE_LOGGER)
+#if defined(ENABLE_CUTE_LOGGER)
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>

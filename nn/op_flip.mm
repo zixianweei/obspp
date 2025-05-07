@@ -1,8 +1,8 @@
 #include "op_flip.h"
 
-#include "base/logger.h"
-#include "context.h"
-#include "tensor.h"
+#include "base/context.hpp"
+#include "base/logger.hpp"
+#include "base/tensor.hpp"
 
 namespace cute {
 

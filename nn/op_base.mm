@@ -1,7 +1,7 @@
 #include "op_base.h"
 
-#include "base/logger.h"
-#include "context.h"
+#include "base/context.hpp"
+#include "base/logger.hpp"
 #include "property.h"
 
 namespace cute {

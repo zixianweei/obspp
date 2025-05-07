@@ -4,7 +4,7 @@
 #include <string>
 
 #include "base/macros.hpp"
-#include "tensor.h"
+#include "base/tensor.hpp"
 
 namespace cute {
 
