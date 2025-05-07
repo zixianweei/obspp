@@ -58,8 +58,7 @@ target_link_options(
     ${PROJECT_NAME}
     PRIVATE
     -fsanitize=address
-    -Wl,-sectcreate,__TEXT,metal_basic,${CUTE_METALLIB_BINARY_DIR}/kernels_basic.metallib
-    -Wl,-sectcreate,__TEXT,metal_bfloat,${CUTE_METALLIB_BINARY_DIR}/kernels_bfloat.metallib
+    -Wl,-sectcreate,__TEXT,metal_basic,${CUTE_METALLIB_BINARY_DIR}/kernels.metallib
 )
 
 target_link_libraries(
@@ -86,9 +85,10 @@ target_sources(
     base/tensor.hpp
     base/tensor.mm
     base/types.hpp
-    nn/op_base.mm
+    nn/op_base.cpp
     nn/op_base.h
-    nn/op_flip.mm
+    nn/op_flip_unittest.cpp
+    nn/op_flip.cpp
     nn/op_flip.h
     nn/op_softmax_unittest.cpp
     nn/op_softmax.cpp

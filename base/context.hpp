@@ -4,18 +4,9 @@
 #include <string>
 
 #include "base/macros.hpp"
+#include "base/types.hpp"
 
 CUTENN_OBJC_FORWARD_DECLARATION(CuteContextImpl);
-
-#ifdef __OBJC__
-#include <Foundation/Foundation.h>
-#include <Metal/Metal.h>
-#endif
-
-CUTENN_TYPE_ALIAS(id<MTLDevice>, MTLDevicePtr);
-CUTENN_TYPE_ALIAS(id<MTLCommandQueue>, MTLCommandQueuePtr);
-CUTENN_TYPE_ALIAS(id<MTLComputePipelineState>, MTLComputePipelineStatePtr);
-CUTENN_TYPE_ALIAS(id<MTLComputeCommandEncoder>, MTLComputeCommandEncoderPtr);
 
 namespace cutenn {
 
@@ -34,8 +25,18 @@ public:
 
   MTLDevicePtr GetDevice();
   MTLCommandQueuePtr GetCommandQueue();
-  MTLComputePipelineStatePtr findComputePipelineState(const std::string &kname);
+  MTLComputePipelineStatePtr GetComputePipelineState(const std::string &kname);
   MTLComputeCommandEncoderPtr GetCommandEncoder();
+
+  MTLBufferPtr MakeBuffer(const void *data, size_t size);
+  void SetCommandEncoderComputePipelineState(void *encoder, void *state);
+  void SetCommandEncoderBuffer(void *encoder, void *buffer, int offset,
+                               int index);
+  unsigned int GetMaxTotalThreadsPerThreadgroup(void *state);
+  unsigned int GetThreadExecutionWidth(void *state);
+  void DispatchThreads(void *encoder, const Size &threads,
+                       const Size &threadsPerThreadgroup);
+  void EndEncoding(void *encoder);
   bool Commit();
 
 private:

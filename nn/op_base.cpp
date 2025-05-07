@@ -18,15 +18,8 @@ MTLBufferPtr OpBase::AllocateTensorProperty(const Tensor &src,
   property.o_h = dst.GetShape()[2];
   property.o_w = dst.GetShape()[3];
 
-  MTLBufferPtr property_buffer = [Context::GetInstance().GetDevice()
-      newBufferWithBytes:(const void *)(&property)
-                  length:sizeof(TensorProperty)
-                 options:MTLResourceCPUCacheModeWriteCombined];
-  if (property_buffer == nil) {
-    CUTENN_LOG_ERROR("{}: failed to allocate property buffer.", __func__);
-    return nil;
-  }
-  return property_buffer;
+  return Context::GetInstance().MakeBuffer((const void *)&property,
+                                           sizeof(TensorProperty));
 }
 
 } // namespace cutenn

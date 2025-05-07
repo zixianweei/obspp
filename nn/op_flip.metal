@@ -12,6 +12,6 @@ kernel void kernel_flip(
     auto inptr = input + (gid.y) * property.i_w * property.i_c + (gid.x) * property.i_c;
 
     *outptr = *inptr;
-    *(outptr + 1) = *(inptr + 1);
-    *(outptr + 2) = *(inptr + 2);
+    //*(outptr + 1) = *(inptr + 1);
+    //*(outptr + 2) = *(inptr + 2);
 }

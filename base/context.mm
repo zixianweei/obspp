@@ -6,6 +6,7 @@
 #include <mach-o/getsect.h>
 
 #include "base/logger.hpp"
+#include "base/types.hpp"
 
 static dispatch_data_t find_section_data(const std::string &section_name) {
   uint32_t image_idx = 0U;
@@ -32,6 +33,10 @@ static dispatch_data_t find_section_data(const std::string &section_name) {
                               dispatch_get_main_queue(),
                               ^(){
                               });
+}
+
+inline MTLSize size_to_mtl_size(const cutenn::Size &size) {
+  return MTLSizeMake(size.x, size.y, size.z);
 }
 
 typedef NSMutableDictionary<NSString *, id<MTLComputePipelineState>>
@@ -215,12 +220,58 @@ MTLDevicePtr Context::GetDevice() { return [impl_ device]; }
 MTLCommandQueuePtr Context::GetCommandQueue() { return [impl_ commandQueue]; }
 
 MTLComputePipelineStatePtr
-Context::findComputePipelineState(const std::string &kname) {
+Context::GetComputePipelineState(const std::string &kname) {
   return [impl_ findComputePipelineState:[CuteContextImpl toString:kname]];
 }
 
 MTLComputeCommandEncoderPtr Context::GetCommandEncoder() {
   return [impl_ createEncoder];
+}
+
+MTLBufferPtr Context::MakeBuffer(const void *data, size_t size) {
+  MTLBufferPtr buffer =
+      [[impl_ device] newBufferWithBytes:data
+                                  length:size
+                                 options:MTLResourceStorageModeShared];
+  if (buffer == nil) {
+    CUTENN_LOG_ERROR("{}: failed to allocate property buffer.", __func__);
+    return nil;
+  }
+  return buffer;
+}
+
+void Context::SetCommandEncoderComputePipelineState(void *encoder,
+                                                    void *state) {
+  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
+      setComputePipelineState:static_cast<MTLComputePipelineStatePtr>(state)];
+}
+
+void Context::SetCommandEncoderBuffer(void *encoder, void *buffer, int offset,
+                                      int index) {
+  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
+      setBuffer:static_cast<MTLBufferPtr>(buffer)
+         offset:offset
+        atIndex:index];
+}
+
+unsigned int Context::GetMaxTotalThreadsPerThreadgroup(void *state) {
+  return [static_cast<MTLComputePipelineStatePtr>(state)
+      maxTotalThreadsPerThreadgroup];
+}
+
+unsigned int Context::GetThreadExecutionWidth(void *state) {
+  return [static_cast<MTLComputePipelineStatePtr>(state) threadExecutionWidth];
+}
+
+void Context::DispatchThreads(void *encoder, const Size &threads,
+                              const Size &threadsPerThreadgroup) {
+  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
+            dispatchThreads:size_to_mtl_size(threads)
+      threadsPerThreadgroup:size_to_mtl_size(threadsPerThreadgroup)];
+}
+
+void Context::EndEncoding(void *encoder) {
+  [static_cast<MTLComputeCommandEncoderPtr>(encoder) endEncoding];
 }
 
 bool Context::Commit() { return [impl_ commit]; }
