@@ -19,6 +19,12 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
     return false;
   }
 
+#if defined(CUTENN_METAL_DEBUG)
+  Context::GetInstance().BeginCaptureScope();
+  Context::GetInstance().PushCommandEncoderToDebugGroup(commandEncoder,
+                                                        "OpFlip::Forward");
+#endif
+
   MTLComputePipelineStatePtr computePipelineState =
       Context::GetInstance().GetComputePipelineState(GetKernelName());
   if (computePipelineState == nullptr) {
@@ -51,6 +57,12 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
 
   Context::GetInstance().DispatchThreads(commandEncoder, threads,
                                          threadsPerThreadgroup);
+
+#if defined(CUTENN_METAL_DEBUG)
+  Context::GetInstance().PopCommandEncoderFromDebugGroup(commandEncoder);
+  Context::GetInstance().EndCaptureScope();
+#endif
+
   Context::GetInstance().EndEncoding(commandEncoder);
 
   if (!Context::GetInstance().Commit()) {

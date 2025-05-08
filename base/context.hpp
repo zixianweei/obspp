@@ -39,6 +39,14 @@ public:
   void EndEncoding(void *encoder);
   bool Commit();
 
+#if defined(CUTENN_METAL_DEBUG)
+  void MakeCaptureScopeAvailable();
+  void BeginCaptureScope();
+  void EndCaptureScope();
+  void PushCommandEncoderToDebugGroup(void *encoder, const std::string &label);
+  void PopCommandEncoderFromDebugGroup(void *encoder);
+#endif // CUTENN_METAL_DEBUG
+
 private:
   Context();
 

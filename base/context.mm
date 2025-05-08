@@ -53,11 +53,19 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
 @property(strong, nonatomic) ComputePipelineStateDictionary cachedCPS;
 @property(strong, nonatomic) id<MTLCommandBuffer> commandBuffer;
 @property(strong, nonatomic) CommandBufferArray schedCommandBuffer;
+#if defined(CUTENN_METAL_DEBUG)
+@property(strong, nonatomic) id<MTLCaptureScope> captureScope;
+@property(assign, nonatomic) BOOL isCaptureScopeOn;
+#endif // CUTENN_METAL_DEBUG
 
 - (void)dealloc;
 - (id<MTLComputePipelineState>)findComputePipelineState:(NSString *)kernelName;
 - (id<MTLComputeCommandEncoder>)createEncoder;
 - (BOOL)commit;
+#if defined(CUTENN_METAL_DEBUG)
+- (void)SwitchOnCapture;
+- (void)SwitchOffCapture;
+#endif // CUTENN_METAL_DEBUG
 @end
 
 @interface CuteContextImpl ()
@@ -142,6 +150,9 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
   CUTENN_SAFE_RELEASE(_cachedCPS);
   CUTENN_SAFE_RELEASE(_commandBuffer);
   CUTENN_SAFE_RELEASE(_schedCommandBuffer);
+#if defined(CUTENN_METAL_DEBUG)
+  CUTENN_SAFE_RELEASE(_captureScope);
+#endif // CUTENN_METAL_DEBUG
   [super dealloc];
 }
 
@@ -196,6 +207,48 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
   return [NSString stringWithCString:s.c_str()
                             encoding:[NSString defaultCStringEncoding]];
 }
+
+#if defined(CUTENN_METAL_DEBUG)
+- (void)SwitchOnCapture {
+  if ([self isCaptureScopeOn]) {
+    return;
+  }
+  [self setCaptureScope:[[MTLCaptureManager sharedCaptureManager]
+                            newCaptureScopeWithDevice:[self device]]];
+  if ([self captureScope] == nil) {
+    CUTENN_LOG_ERROR("{}: failed to create capture scope", __func__);
+    return;
+  }
+
+  MTLCaptureDescriptor *descriptor = [[MTLCaptureDescriptor alloc] init];
+  descriptor.captureObject = [self captureScope];
+  descriptor.destination = MTLCaptureDestinationGPUTraceDocument;
+  // descriptor.outputURL = [NSURL fileURLWithPath:[NSString
+  // stringWithFormat:@"/tmp/%@.gputrace", [NSUUID UUID].UUIDString]];
+  descriptor.outputURL = [NSURL
+      fileURLWithPath:[NSString stringWithFormat:@"/tmp/cutenn.gputrace"]];
+
+  NSError *error = nil;
+  if (![[MTLCaptureManager sharedCaptureManager]
+          startCaptureWithDescriptor:descriptor
+                               error:&error]) {
+    CUTENN_LOG_ERROR("{}: failed to start capture: {}", __func__,
+                     [[error description] UTF8String]);
+  }
+  [self setIsCaptureScopeOn:YES];
+  [[self captureScope] beginScope];
+}
+
+- (void)SwitchOffCapture {
+  if (![self isCaptureScopeOn]) {
+    return;
+  }
+  [[self captureScope] endScope];
+  [[MTLCaptureManager sharedCaptureManager] stopCapture];
+  [self setIsCaptureScopeOn:NO];
+}
+
+#endif // CUTENN_METAL_DEBUG
 
 @end
 
@@ -276,5 +329,38 @@ void Context::EndEncoding(void *encoder) {
 }
 
 bool Context::Commit() { return [impl_ commit]; }
+
+#if defined(CUTENN_METAL_DEBUG)
+
+void Context::MakeCaptureScopeAvailable() { [impl_ SwitchOnCapture]; }
+
+void Context::BeginCaptureScope() {
+  if (![impl_ isCaptureScopeOn]) {
+    CUTENN_LOG_INFO("{}: capture scope is not available", __func__);
+    return;
+  }
+  [[impl_ captureScope] beginScope];
+}
+
+void Context::EndCaptureScope() {
+  if (![impl_ isCaptureScopeOn]) {
+    CUTENN_LOG_INFO("{}: capture scope is not available", __func__);
+    return;
+  }
+  [[impl_ captureScope] endScope];
+}
+
+void Context::PushCommandEncoderToDebugGroup(void *encoder,
+                                             const std::string &label) {
+  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
+      pushDebugGroup:[NSString stringWithCString:label.c_str()
+                                        encoding:NSUTF8StringEncoding]];
+}
+
+void Context::PopCommandEncoderFromDebugGroup(void *encoder) {
+  [static_cast<MTLComputeCommandEncoderPtr>(encoder) popDebugGroup];
+}
+
+#endif // CUTENN_METAL_DEBUG
 
 } // namespace cutenn

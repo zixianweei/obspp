@@ -38,6 +38,7 @@ target_compile_definitions(
     ${PROJECT_NAME}
     PRIVATE
     CUTENN_DEBUG
+    CUTENN_METAL_DEBUG
     HAVE_CPUONLY
     HAVE_METAL
 )
