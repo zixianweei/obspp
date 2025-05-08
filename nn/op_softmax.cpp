@@ -78,8 +78,15 @@ bool OpSoftmax::Forward(Tensor &src, Tensor &dst) {
     return false;
   }
 
+#if defined(CUTENN_METAL_DEBUG)
+  Context::GetInstance().BeginCaptureScope();
+  Context::GetInstance().PushCommandEncoderToDebugGroup(commandEncoder,
+                                                        "OpSoftmax::Forward");
+#endif
+
   MTLComputePipelineStatePtr computePipelineState =
-      Context::GetInstance().GetComputePipelineState(GetKernelName());
+      Context::GetInstance().GetComputePipelineState(
+          GetKernelName(src.GetDims(), GetAxis()));
   if (computePipelineState == nullptr) {
     CUTENN_LOG_ERROR("{}: compute pipeline state is nil");
     return false;
@@ -101,30 +108,27 @@ bool OpSoftmax::Forward(Tensor &src, Tensor &dst) {
   unsigned int threadExecutionWidth =
       Context::GetInstance().GetThreadExecutionWidth(computePipelineState);
 
+#if defined(CUTENN_METAL_DEBUG)
+  Context::GetInstance().PopCommandEncoderFromDebugGroup(commandEncoder);
+#endif
+
+  Context::GetInstance().EndEncoding(commandEncoder);
+
   if (!Context::GetInstance().Commit()) {
     CUTENN_LOG_ERROR("{}: commit failed", __func__);
     return false;
   }
 
+#if defined(CUTENN_METAL_DEBUG)
+  Context::GetInstance().EndCaptureScope();
+#endif
+
   return true;
 }
 
-std::string OpSoftmax::GetKernelName() const {
-  int axis = GetAxis();
-  switch (axis) {
-  case 0:
-    return "kernel_softmax_axis_0";
-  case 1:
-    return "kernel_softmax_axis_1";
-  case 2:
-    return "kernel_softmax_axis_2";
-  case 3:
-    return "kernel_softmax_axis_3";
-  default:
-    break;
-  }
-  CUTENN_LOG_CRITICAL("{}: axis {} is not supported", __func__, axis);
-  return "";
+std::string OpSoftmax::GetKernelName(int dims, int axis) const {
+  return "kernel_softmax_dims_" + std::to_string(dims) + "_axis_" +
+         std::to_string(axis);
 }
 
 MTLBufferPtr OpSoftmax::MakeAttribute(Tensor &src, Tensor &dst) {

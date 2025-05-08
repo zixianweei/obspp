@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(CuteNN)
+project(CUTENN)
 
 find_library(FOUNDATION_LIBRARY Foundation REQUIRED)
 find_library(METAL_FRAMEWORK Metal REQUIRED)

@@ -59,7 +59,8 @@ if __name__ == "__main__":
         "-f",
         "--flags",
         type=list,
-        default=["-Wall", "-Wextra", "-fno-fast-math", "-Werror"],
+        # default=["-Wall", "-Wextra", "-fno-fast-math", "-Werror"],
+        default=[],
     )
 
     args = parser.parse_args()

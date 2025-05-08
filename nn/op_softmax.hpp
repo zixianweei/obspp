@@ -1,6 +1,8 @@
 #ifndef CUTENN_OP_SOFTMAX_HPP_
 #define CUTENN_OP_SOFTMAX_HPP_
 
+#include <string>
+
 #include "nn/op_base.h"
 
 namespace cutenn {
@@ -11,7 +13,7 @@ public:
   explicit OpSoftmax(int axis) : axis_(axis) {};
 
   bool Forward(Tensor &src, Tensor &dst) override;
-  std::string GetKernelName() const override;
+  std::string GetKernelName(int dims, int axis) const;
   MTLBufferPtr MakeAttribute(Tensor &src, Tensor &dst) override;
 
   int GetAxis() const { return axis_; }

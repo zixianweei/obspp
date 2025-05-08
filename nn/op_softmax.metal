@@ -1,5 +1,6 @@
 #include <metal_stdlib>
 #include <simd/simd.h>
+#include "nn/types.hpp"
 using namespace metal;
 
 kernel void kernel_softmax_dims_1_axis_0(

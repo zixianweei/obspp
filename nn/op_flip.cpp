@@ -60,7 +60,6 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
 
 #if defined(CUTENN_METAL_DEBUG)
   Context::GetInstance().PopCommandEncoderFromDebugGroup(commandEncoder);
-  Context::GetInstance().EndCaptureScope();
 #endif
 
   Context::GetInstance().EndEncoding(commandEncoder);
@@ -69,6 +68,10 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
     CUTENN_LOG_ERROR("{}: commit failed", __func__);
     return false;
   }
+
+#if defined(CUTENN_METAL_DEBUG)
+  Context::GetInstance().EndCaptureScope();
+#endif
 
   return true;
 }

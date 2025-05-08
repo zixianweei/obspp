@@ -113,9 +113,14 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
 
   if (_library == nil) {
     NSError *error = nil;
-    // _library = [_device newLibraryWithData:find_section_data("metal_basic")
-    //                                  error:&error];
-    _library = [_device newLibraryWithFile:@"cutenn.metallib" error:&error];
+#if defined(CUTENN_EMBED_METALLIB)
+    _library = [_device newLibraryWithData:find_section_data("cutenn_metallib")
+                                     error:&error];
+#else
+    _library =
+        [_device newLibraryWithURL:[NSURL fileURLWithPath:@"cutenn.metallib"]
+                             error:&error];
+#endif // CUTENN_EMBED_METALLIB
     if (error) {
       CUTENN_LOG_ERROR("{}: error: {}", __func__,
                        [[error description] UTF8String]);
@@ -263,6 +268,7 @@ Context &Context::GetInstance() {
 Context::Context() { impl_ = [[CuteContextImpl alloc] init]; }
 
 Context::~Context() {
+  [impl_ SwitchOffCapture];
 #if !__has_feature(objc_arc)
   [impl_ release];
 #endif
