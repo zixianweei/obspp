@@ -12,6 +12,60 @@ int normalize_axis(int axis, int ndims) {
   return (axis < 0) ? axis + ndims : axis;
 }
 
+void make_attribute_dims_1(OpSoftmaxAttribute &attr, const TShape &ishape,
+                           const TShape &oshape, int axis) {
+  CUTENN_CHECK(ishape.size() == 1U, "{}: invalid dims = {}.", __func__,
+               ishape.size());
+  axis = normalize_axis(axis, ishape.size());
+  attr.axis = axis;
+  attr.i_h = 1;
+  attr.i_w = ishape[0];
+  attr.o_h = 1;
+  attr.o_w = oshape[0];
+}
+
+void make_attribute_dims_2(OpSoftmaxAttribute &attr, const TShape &ishape,
+                           const TShape &oshape, int axis) {
+  CUTENN_CHECK(ishape.size() == 2U, "{}: invalid dims = {}.", __func__,
+               ishape.size());
+  axis = normalize_axis(axis, ishape.size());
+  attr.axis = axis;
+  attr.i_h = ishape[1];
+  attr.i_w = ishape[0];
+  attr.o_h = oshape[1];
+  attr.o_w = oshape[0];
+}
+
+void make_attribute_dims_3(OpSoftmaxAttribute &attr, const TShape &ishape,
+                           const TShape &oshape, int axis) {
+  CUTENN_CHECK(ishape.size() == 3U, "{}: invalid dims = {}.", __func__,
+               ishape.size());
+  axis = normalize_axis(axis, ishape.size());
+  attr.axis = axis;
+  attr.i_c = ishape[2];
+  attr.i_h = ishape[1];
+  attr.i_w = ishape[0];
+  attr.o_c = oshape[2];
+  attr.o_h = oshape[1];
+  attr.o_w = oshape[0];
+}
+
+void make_attribute_dims_4(OpSoftmaxAttribute &attr, const TShape &ishape,
+                           const TShape &oshape, int axis) {
+  CUTENN_CHECK(ishape.size() == 4U, "{}: invalid dims = {}.", __func__,
+               ishape.size());
+  axis = normalize_axis(axis, ishape.size());
+  attr.axis = axis;
+  attr.i_n = ishape[3];
+  attr.i_c = ishape[2];
+  attr.i_h = ishape[1];
+  attr.i_w = ishape[0];
+  attr.o_n = oshape[3];
+  attr.o_c = oshape[2];
+  attr.o_h = oshape[1];
+  attr.o_w = oshape[0];
+}
+
 bool OpSoftmax::Forward(Tensor &src, Tensor &dst) {
   CUTENN_CHECK(src.GetDims() == dst.GetDims(),
                "{}: src dims = {}, dst dims = {}.", __func__, src.GetDims(),
@@ -52,7 +106,6 @@ bool OpSoftmax::Forward(Tensor &src, Tensor &dst) {
     return false;
   }
 
-  int naxis = normalize_axis(GetAxis(), src.GetDims());
   return true;
 }
 
@@ -76,9 +129,24 @@ std::string OpSoftmax::GetKernelName() const {
 
 MTLBufferPtr OpSoftmax::MakeAttribute(Tensor &src, Tensor &dst) {
   OpSoftmaxAttribute attribute;
-  // attribute.i_shape = src.GetShape();
-  // attribute.o_shape = dst.GetShape();
-  attribute.axis = GetAxis();
+  switch (src.GetDims()) {
+  case 1:
+    make_attribute_dims_1(attribute, src.GetShape(), dst.GetShape(), GetAxis());
+    break;
+  case 2:
+    make_attribute_dims_2(attribute, src.GetShape(), dst.GetShape(), GetAxis());
+    break;
+  case 3:
+    make_attribute_dims_3(attribute, src.GetShape(), dst.GetShape(), GetAxis());
+    break;
+  case 4:
+    make_attribute_dims_4(attribute, src.GetShape(), dst.GetShape(), GetAxis());
+    break;
+  default:
+    CUTENN_LOG_CRITICAL("{}: dims = {} is not supported", __func__,
+                        src.GetDims());
+    break;
+  }
   return Context::GetInstance().MakeBuffer(&attribute, sizeof(attribute));
 }
 

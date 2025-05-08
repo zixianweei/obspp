@@ -31,7 +31,6 @@
 #define CUTENN_CHECK(__condition__, ...)                                       \
   if (!(__condition__)) {                                                      \
     CUTENN_LOG_CRITICAL(__VA_ARGS__);                                          \
-    return false;                                                              \
   }
 
 #endif // !CUTENN_BASE_MACROS_HPP_
