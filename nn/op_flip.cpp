@@ -47,7 +47,7 @@ bool OpFlip::Forward(Tensor &src, Tensor &dst) {
 
   Size threadsPerThreadgroup =
       MakeSize(threadExecutionWidth, threadExecutionHeight, 1);
-  Size threads = MakeSize(src.GetShape()[1], src.GetShape()[0], 1);
+  Size threads = MakeSize(src.GetShape()[0], src.GetShape()[1], 1);
 
   Context::GetInstance().DispatchThreads(commandEncoder, threads,
                                          threadsPerThreadgroup);

@@ -101,12 +101,13 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
     return nil;
   }
 
-  _queue = dispatch_queue_create("OpenCV_Metal", DISPATCH_QUEUE_CONCURRENT);
+  _queue = dispatch_queue_create("cutenn_metal", DISPATCH_QUEUE_CONCURRENT);
 
   if (_library == nil) {
     NSError *error = nil;
-    _library = [_device newLibraryWithData:find_section_data("metal_basic")
-                                     error:&error];
+    // _library = [_device newLibraryWithData:find_section_data("metal_basic")
+    //                                  error:&error];
+    _library = [_device newLibraryWithFile:@"cutenn.metallib" error:&error];
     if (error) {
       CUTENN_LOG_ERROR("{}: error: {}", __func__,
                        [[error description] UTF8String]);
