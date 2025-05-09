@@ -78,14 +78,14 @@ target_link_libraries(
 target_sources(
     ${PROJECT_NAME}
     PRIVATE
-    base/context.hpp
+    base/context.h
     base/context.mm
     base/logger.cpp
-    base/logger.hpp
-    base/macros.hpp
-    base/tensor.hpp
+    base/logger.h
+    base/macros.h
+    base/tensor.h
     base/tensor.mm
-    base/types.hpp
+    base/types.h
     nn/op_base.cpp
     nn/op_base.h
     nn/op_flip_unittest.cpp
@@ -93,8 +93,8 @@ target_sources(
     nn/op_flip.h
     nn/op_softmax_unittest.cpp
     nn/op_softmax.cpp
-    nn/op_softmax.hpp
-    nn/types.hpp
+    nn/op_softmax.h
+    nn/types.h
     testing/cutenn_test_main.cpp
 )
 

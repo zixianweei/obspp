@@ -1,12 +1,12 @@
-#include "context.hpp"
+#include "context.h"
 
 #include <string>
 
 #include <mach-o/dyld.h>
 #include <mach-o/getsect.h>
 
-#include "base/logger.hpp"
-#include "base/types.hpp"
+#include "base/logger.h"
+#include "base/types.h"
 
 static dispatch_data_t find_section_data(const std::string &section_name) {
   uint32_t image_idx = 0U;

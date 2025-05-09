@@ -1,9 +1,9 @@
 #include "op_flip.h"
 
-#include "base/context.hpp"
-#include "base/logger.hpp"
-#include "base/tensor.hpp"
-#include "nn/types.hpp"
+#include "base/context.h"
+#include "base/logger.h"
+#include "base/tensor.h"
+#include "nn/types.h"
 
 namespace cutenn {
 

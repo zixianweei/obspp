@@ -1,5 +1,5 @@
-#ifndef CUTENN_NN_TYPES_HPP_
-#define CUTENN_NN_TYPES_HPP_
+#ifndef CUTENN_NN_TYPES_H_
+#define CUTENN_NN_TYPES_H_
 
 namespace cutenn {
 
@@ -24,4 +24,4 @@ struct OpSoftmaxAttribute {
 
 } // namespace cutenn
 
-#endif // !CUTENN_NN_TYPES_HPP_
+#endif // !CUTENN_NN_TYPES_H_

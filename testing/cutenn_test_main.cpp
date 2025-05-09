@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "base/context.hpp"
-#include "base/logger.hpp"
+#include "base/context.h"
+#include "base/logger.h"
 
 int main() {
   cutenn::Logger::GetInstance().Init("cutenn.log");

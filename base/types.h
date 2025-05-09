@@ -1,9 +1,9 @@
-#ifndef CUTENN_BASE_TYPES_HPP_
-#define CUTENN_BASE_TYPES_HPP_
+#ifndef CUTENN_BASE_TYPES_H_
+#define CUTENN_BASE_TYPES_H_
 
 #include <vector>
 
-#include "base/macros.hpp"
+#include "base/macros.h"
 
 #ifdef __OBJC__
 #include <Foundation/Foundation.h>
@@ -45,4 +45,4 @@ inline Size MakeSize(unsigned int x, unsigned int y, unsigned int z) {
 
 } // namespace cutenn
 
-#endif //! CUTENN_BASE_TYPES_HPP_
+#endif //! CUTENN_BASE_TYPES_H_

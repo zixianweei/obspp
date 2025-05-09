@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "base/tensor.hpp"
+#include "base/tensor.h"
 #include "nn/op_flip.h"
 
 TEST(OpFlip, OpFlipTest) {

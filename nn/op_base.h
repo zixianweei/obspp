@@ -1,7 +1,7 @@
 #ifndef CUTENN_NN_OP_BASE_H_
 #define CUTENN_NN_OP_BASE_H_
 
-#include "base/types.hpp"
+#include "base/types.h"
 
 namespace cutenn {
 

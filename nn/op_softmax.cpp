@@ -1,10 +1,10 @@
-#include "nn/op_softmax.hpp"
+#include "nn/op_softmax.h"
 
-#include "base/context.hpp"
-#include "base/logger.hpp"
-#include "base/macros.hpp"
-#include "base/tensor.hpp"
-#include "nn/types.hpp"
+#include "base/context.h"
+#include "base/logger.h"
+#include "base/macros.h"
+#include "base/tensor.h"
+#include "nn/types.h"
 
 namespace cutenn {
 

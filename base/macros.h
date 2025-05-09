@@ -1,7 +1,7 @@
-#ifndef CUTENN_BASE_MACROS_HPP_
-#define CUTENN_BASE_MACROS_HPP_
+#ifndef CUTENN_BASE_MACROS_H_
+#define CUTENN_BASE_MACROS_H_
 
-#include "base/logger.hpp"
+#include "base/logger.h"
 
 #if !__has_feature(objc_arc)
 #define CUTENN_SAFE_RELEASE(__object__)                                        \
@@ -33,4 +33,4 @@
     CUTENN_LOG_CRITICAL(__VA_ARGS__);                                          \
   }
 
-#endif // !CUTENN_BASE_MACROS_HPP_
+#endif // !CUTENN_BASE_MACROS_H_

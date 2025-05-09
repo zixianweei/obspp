@@ -1,12 +1,12 @@
-#include "tensor.hpp"
+#include "tensor.h"
 
 #include <Foundation/Foundation.h>
 #include <Metal/Metal.h>
 
 #include <vector>
 
-#include "base/context.hpp"
-#include "base/logger.hpp"
+#include "base/context.h"
+#include "base/logger.h"
 
 namespace {
 

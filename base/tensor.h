@@ -1,8 +1,8 @@
 #ifndef CUTENN_BASE_TENSOR_H_
 #define CUTENN_BASE_TENSOR_H_
 
-#include "base/macros.hpp"
-#include "base/types.hpp"
+#include "base/macros.h"
+#include "base/types.h"
 
 CUTENN_OBJC_FORWARD_DECLARATION(TensorImpl);
 

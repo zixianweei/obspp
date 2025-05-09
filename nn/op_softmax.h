@@ -1,5 +1,5 @@
-#ifndef CUTENN_OP_SOFTMAX_HPP_
-#define CUTENN_OP_SOFTMAX_HPP_
+#ifndef CUTENN_OP_SOFTMAX_H_
+#define CUTENN_OP_SOFTMAX_H_
 
 #include <string>
 
@@ -25,4 +25,4 @@ private:
 
 } // namespace cutenn
 
-#endif // !CUTENN_OP_SOFTMAX_HPP_
+#endif // !CUTENN_OP_SOFTMAX_H_

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "base/tensor.hpp"
-#include "nn/op_softmax.hpp"
+#include "base/tensor.h"
+#include "nn/op_softmax.h"
 
 TEST(OpSoftmax, Softmax1DAxis0) {
   std::vector<float> src_data = {1.0, 2.0, 3.0};

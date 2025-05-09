@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "base/macros.hpp"
-#include "base/types.hpp"
+#include "base/macros.h"
+#include "base/types.h"
 
 CUTENN_OBJC_FORWARD_DECLARATION(CuteContextImpl);
 
