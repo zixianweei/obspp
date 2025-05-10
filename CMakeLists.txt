@@ -88,14 +88,14 @@ target_sources(
     base/types.h
     nn/op_base.cpp
     nn/op_base.h
-    nn/op_flip_unittest.cpp
+    nn/op_flip_unittest.mm
     nn/op_flip.cpp
     nn/op_flip.h
-    nn/op_softmax_unittest.cpp
+    nn/op_softmax_unittest.mm
     nn/op_softmax.cpp
     nn/op_softmax.h
     nn/types.h
-    testing/cutenn_test_main.cpp
+    testing/cutenn_test_main.mm
 )
 
 gtest_add_tests(TARGET ${PROJECT_NAME})
