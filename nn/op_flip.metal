@@ -1,5 +1,5 @@
 #include <metal_stdlib>
-#include "nn/types.hpp"
+#include "nn/types.h"
 using namespace metal;
 
 kernel void kernel_flip(

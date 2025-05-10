@@ -14,7 +14,6 @@ public:
 
   bool Forward(Tensor &src, Tensor &dst) override;
   std::string GetKernelName(int dims, int axis) const;
-  MTLBufferPtr MakeAttribute(Tensor &src, Tensor &dst) override;
 
   int GetAxis() const { return axis_; }
   void SetAxis(int axis) { axis_ = axis; }

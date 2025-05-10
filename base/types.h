@@ -5,16 +5,16 @@
 
 #include "base/macros.h"
 
-#ifdef __OBJC__
-#include <Foundation/Foundation.h>
-#include <Metal/Metal.h>
-#endif
+// #ifdef __OBJC__
+// #include <Foundation/Foundation.h>
+// #include <Metal/Metal.h>
+// #endif
 
-CUTENN_TYPE_ALIAS(id<MTLDevice>, MTLDevicePtr);
-CUTENN_TYPE_ALIAS(id<MTLCommandQueue>, MTLCommandQueuePtr);
-CUTENN_TYPE_ALIAS(id<MTLComputePipelineState>, MTLComputePipelineStatePtr);
-CUTENN_TYPE_ALIAS(id<MTLComputeCommandEncoder>, MTLComputeCommandEncoderPtr);
-CUTENN_TYPE_ALIAS(id<MTLBuffer>, MTLBufferPtr);
+// CUTENN_TYPE_ALIAS(id<MTLDevice>, MTLDevicePtr);
+// CUTENN_TYPE_ALIAS(id<MTLCommandQueue>, MTLCommandQueuePtr);
+// CUTENN_TYPE_ALIAS(id<MTLComputePipelineState>, MTLComputePipelineStatePtr);
+// CUTENN_TYPE_ALIAS(id<MTLComputeCommandEncoder>, MTLComputeCommandEncoderPtr);
+// CUTENN_TYPE_ALIAS(id<MTLBuffer>, MTLBufferPtr);
 
 namespace cutenn {
 
@@ -33,15 +33,15 @@ enum class Format {
 
 using TShape = std::vector<int>;
 
-struct Size {
-  unsigned int x;
-  unsigned int y;
-  unsigned int z;
-};
+// struct Size {
+//   unsigned int x;
+//   unsigned int y;
+//   unsigned int z;
+// };
 
-inline Size MakeSize(unsigned int x, unsigned int y, unsigned int z) {
-  return {.x = x, .y = y, .z = z};
-}
+// inline Size MakeSize(unsigned int x, unsigned int y, unsigned int z) {
+//   return {.x = x, .y = y, .z = z};
+// }
 
 } // namespace cutenn
 

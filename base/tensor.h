@@ -4,6 +4,11 @@
 #include "base/macros.h"
 #include "base/types.h"
 
+#ifdef __OBJC__
+#include <Foundation/Foundation.h>
+#include <Metal/Metal.h>
+#endif // __OBJC__
+
 CUTENN_OBJC_FORWARD_DECLARATION(TensorImpl);
 
 namespace cutenn {
@@ -27,7 +32,10 @@ public:
 
   TShape GetShape() const;
   size_t GetDims() const;
-  MTLBufferPtr GetRawBuffer();
+
+#ifdef __OBJC__
+  id<MTLBuffer> GetRawBuffer();
+#endif // __OBJC__
 
 private:
   TensorImpl *impl_;

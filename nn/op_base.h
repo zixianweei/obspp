@@ -10,7 +10,6 @@ class Tensor;
 class OpBase {
 public:
   virtual bool Forward(Tensor &src, Tensor &dst) = 0;
-  virtual MTLBufferPtr MakeAttribute(Tensor &src, Tensor &dst) = 0;
 };
 
 } // namespace cutenn

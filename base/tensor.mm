@@ -80,7 +80,7 @@ int element_size(cutenn::Format format) {
 - (BOOL)upload:(const void *)data
          shape:(const cutenn::TShape &)shape
         format:(cutenn::Format)format {
-  id<MTLDevice> device = cutenn::Context::GetInstance().GetDevice();
+  id<MTLDevice> device = [CUTE_CONTEXT device];
   if (device == nil) {
     CUTENN_LOG_ERROR("{}: context device is nil", __func__);
     return FALSE;
@@ -184,6 +184,8 @@ TShape Tensor::GetShape() const { return [impl_ shape]; }
 
 size_t Tensor::GetDims() const { return [impl_ shape].size(); }
 
-MTLBufferPtr Tensor::GetRawBuffer() { return [impl_ buffer]; }
+#ifdef __OBJC__
+id<MTLBuffer> Tensor::GetRawBuffer() { return [impl_ buffer]; }
+#endif // __OBJC__
 
 } // namespace cutenn

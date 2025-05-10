@@ -35,51 +35,18 @@ static dispatch_data_t find_section_data(const std::string &section_name) {
                               });
 }
 
-inline MTLSize size_to_mtl_size(const cutenn::Size &size) {
-  return MTLSizeMake(size.x, size.y, size.z);
-}
-
-typedef NSMutableDictionary<NSString *, id<MTLComputePipelineState>>
-    *ComputePipelineStateDictionary;
-typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
-
-@interface CuteContextImpl : NSObject
-@property(strong, nonatomic) id<MTLDevice> device;
-@property(strong, nonatomic) id<MTLCommandQueue> commandQueue;
-@property(strong, nonatomic) id<MTLLibrary> library;
-@property(assign, nonatomic) BOOL hasSimdGroupReduction;
-@property(assign, nonatomic) BOOL hasBFloat;
-@property(strong, nonatomic) dispatch_queue_t queue;
-@property(strong, nonatomic) ComputePipelineStateDictionary cachedCPS;
-@property(strong, nonatomic) id<MTLCommandBuffer> commandBuffer;
-@property(strong, nonatomic) CommandBufferArray schedCommandBuffer;
-#if defined(CUTENN_METAL_DEBUG)
-@property(strong, nonatomic) id<MTLCaptureScope> captureScope;
-@property(assign, nonatomic) BOOL isCaptureScopeOn;
-#endif // CUTENN_METAL_DEBUG
-
-- (void)dealloc;
-- (id<MTLComputePipelineState>)findComputePipelineState:(NSString *)kernelName;
-- (id<MTLComputeCommandEncoder>)createEncoder;
-- (BOOL)commit;
-#if defined(CUTENN_METAL_DEBUG)
-- (void)SwitchOnCapture;
-- (void)SwitchOffCapture;
-#endif // CUTENN_METAL_DEBUG
-@end
-
-@interface CuteContextImpl ()
+@interface MTL4CuteContext ()
 + (NSString *)toString:(const std::string &)s;
 @end
 
-@implementation CuteContextImpl
+@implementation MTL4CuteContext
 
-- (nonnull instancetype)init {
+- (instancetype)init {
   self = [super init];
 
   CUTENN_LOG_INFO("{}: allocating", __func__);
 
-#if defined(CUTE_DEBUG)
+#if defined(CUTENN_METAL_DEBUG)
   NSArray *devices = MTLCopyAllDevices();
   for (id<MTLDevice> device in devices) {
     CUTENN_LOG_INFO("{}: found device: {}", __func__,
@@ -214,7 +181,7 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
 }
 
 #if defined(CUTENN_METAL_DEBUG)
-- (void)SwitchOnCapture {
+- (void)makeCaptureScopeAvailable {
   if ([self isCaptureScopeOn]) {
     return;
   }
@@ -228,10 +195,8 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
   MTLCaptureDescriptor *descriptor = [[MTLCaptureDescriptor alloc] init];
   descriptor.captureObject = [self captureScope];
   descriptor.destination = MTLCaptureDestinationGPUTraceDocument;
-  // descriptor.outputURL = [NSURL fileURLWithPath:[NSString
-  // stringWithFormat:@"/tmp/%@.gputrace", [NSUUID UUID].UUIDString]];
-  descriptor.outputURL = [NSURL
-      fileURLWithPath:[NSString stringWithFormat:@"/tmp/cutenn.gputrace"]];
+  descriptor.outputURL =
+      [NSURL fileURLWithPath:[NSString stringWithFormat:@"cutenn.gputrace"]];
 
   NSError *error = nil;
   if (![[MTLCaptureManager sharedCaptureManager]
@@ -241,16 +206,21 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
                      [[error description] UTF8String]);
   }
   [self setIsCaptureScopeOn:YES];
+}
+
+- (void)beginCapture {
+  if ([self isCaptureScopeOn]) {
+    return;
+  }
   [[self captureScope] beginScope];
 }
 
-- (void)SwitchOffCapture {
+- (void)endCapture {
   if (![self isCaptureScopeOn]) {
     return;
   }
   [[self captureScope] endScope];
   [[MTLCaptureManager sharedCaptureManager] stopCapture];
-  [self setIsCaptureScopeOn:NO];
 }
 
 #endif // CUTENN_METAL_DEBUG
@@ -260,113 +230,19 @@ typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
 namespace cutenn {
 
 // static
-Context &Context::GetInstance() {
-  static Context instance;
+ContextOwner &ContextOwner::GetInstance() {
+  static ContextOwner instance;
   return instance;
 }
 
-Context::Context() { impl_ = [[CuteContextImpl alloc] init]; }
-
-Context::~Context() {
-  [impl_ SwitchOffCapture];
-#if !__has_feature(objc_arc)
-  [impl_ release];
-#endif
-  impl_ = nullptr;
-}
-
-MTLDevicePtr Context::GetDevice() { return [impl_ device]; }
-
-MTLCommandQueuePtr Context::GetCommandQueue() { return [impl_ commandQueue]; }
-
-MTLComputePipelineStatePtr
-Context::GetComputePipelineState(const std::string &kname) {
-  return [impl_ findComputePipelineState:[CuteContextImpl toString:kname]];
-}
-
-MTLComputeCommandEncoderPtr Context::GetCommandEncoder() {
-  return [impl_ createEncoder];
-}
-
-MTLBufferPtr Context::MakeBuffer(const void *data, size_t size) {
-  MTLBufferPtr buffer =
-      [[impl_ device] newBufferWithBytes:data
-                                  length:size
-                                 options:MTLResourceStorageModeShared];
-  if (buffer == nil) {
-    CUTENN_LOG_ERROR("{}: failed to allocate property buffer.", __func__);
-    return nil;
-  }
-  return buffer;
-}
-
-void Context::SetCommandEncoderComputePipelineState(void *encoder,
-                                                    void *state) {
-  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
-      setComputePipelineState:static_cast<MTLComputePipelineStatePtr>(state)];
-}
-
-void Context::SetCommandEncoderBuffer(void *encoder, void *buffer, int offset,
-                                      int index) {
-  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
-      setBuffer:static_cast<MTLBufferPtr>(buffer)
-         offset:offset
-        atIndex:index];
-}
-
-unsigned int Context::GetMaxTotalThreadsPerThreadgroup(void *state) {
-  return [static_cast<MTLComputePipelineStatePtr>(state)
-      maxTotalThreadsPerThreadgroup];
-}
-
-unsigned int Context::GetThreadExecutionWidth(void *state) {
-  return [static_cast<MTLComputePipelineStatePtr>(state) threadExecutionWidth];
-}
-
-void Context::DispatchThreads(void *encoder, const Size &threads,
-                              const Size &threadsPerThreadgroup) {
-  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
-            dispatchThreads:size_to_mtl_size(threads)
-      threadsPerThreadgroup:size_to_mtl_size(threadsPerThreadgroup)];
-}
-
-void Context::EndEncoding(void *encoder) {
-  [static_cast<MTLComputeCommandEncoderPtr>(encoder) endEncoding];
-}
-
-bool Context::Commit() { return [impl_ commit]; }
-
-#if defined(CUTENN_METAL_DEBUG)
-
-void Context::MakeCaptureScopeAvailable() { [impl_ SwitchOnCapture]; }
-
-void Context::BeginCaptureScope() {
-  if (![impl_ isCaptureScopeOn]) {
-    CUTENN_LOG_INFO("{}: capture scope is not available", __func__);
+ContextOwner::ContextOwner() {
+  context_ = [[MTL4CuteContext alloc] init];
+  if (context_ == nil) {
+    CUTENN_LOG_ERROR("{}: failed to create metal context", __func__);
     return;
   }
-  [[impl_ captureScope] beginScope];
 }
 
-void Context::EndCaptureScope() {
-  if (![impl_ isCaptureScopeOn]) {
-    CUTENN_LOG_INFO("{}: capture scope is not available", __func__);
-    return;
-  }
-  [[impl_ captureScope] endScope];
-}
-
-void Context::PushCommandEncoderToDebugGroup(void *encoder,
-                                             const std::string &label) {
-  [static_cast<MTLComputeCommandEncoderPtr>(encoder)
-      pushDebugGroup:[NSString stringWithCString:label.c_str()
-                                        encoding:NSUTF8StringEncoding]];
-}
-
-void Context::PopCommandEncoderFromDebugGroup(void *encoder) {
-  [static_cast<MTLComputeCommandEncoderPtr>(encoder) popDebugGroup];
-}
-
-#endif // CUTENN_METAL_DEBUG
+ContextOwner::~ContextOwner() { CUTENN_SAFE_RELEASE(context_); }
 
 } // namespace cutenn

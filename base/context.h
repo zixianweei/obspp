@@ -6,53 +6,68 @@
 #include "base/macros.h"
 #include "base/types.h"
 
-CUTENN_OBJC_FORWARD_DECLARATION(CuteContextImpl);
+#ifdef __OBJC__
+
+#include <Foundation/Foundation.h>
+#include <Metal/Metal.h>
+
+typedef NSMutableDictionary<NSString *, id<MTLComputePipelineState>>
+    *ComputePipelineStateDictionary;
+typedef NSMutableArray<id<MTLCommandBuffer>> *CommandBufferArray;
+
+@interface MTL4CuteContext : NSObject
+@property(strong, nonatomic) id<MTLDevice> device;
+@property(strong, nonatomic) id<MTLCommandQueue> commandQueue;
+@property(strong, nonatomic) id<MTLLibrary> library;
+@property(assign, nonatomic) BOOL hasSimdGroupReduction;
+@property(assign, nonatomic) BOOL hasBFloat;
+@property(strong, nonatomic) dispatch_queue_t queue;
+@property(strong, nonatomic) ComputePipelineStateDictionary cachedCPS;
+@property(strong, nonatomic) id<MTLCommandBuffer> commandBuffer;
+@property(strong, nonatomic) CommandBufferArray schedCommandBuffer;
+#if defined(CUTENN_METAL_DEBUG)
+@property(strong, nonatomic) id<MTLCaptureScope> captureScope;
+@property(assign, nonatomic) BOOL isCaptureScopeOn;
+#endif // CUTENN_METAL_DEBUG
+
+- (instancetype)init;
+- (void)dealloc;
+- (id<MTLComputePipelineState>)findComputePipelineState:(NSString *)kernelName;
+- (id<MTLComputeCommandEncoder>)createEncoder;
+- (BOOL)commit;
+#if defined(CUTENN_METAL_DEBUG)
+- (void)makeCaptureScopeAvailable;
+- (void)beginCapture;
+- (void)endCapture;
+#endif // CUTENN_METAL_DEBUG
+@end
+
+#else
+#error DO NOT USE THIS FILE IN NON-OBJC BUILDS.
+#endif // __OBJC__
 
 namespace cutenn {
 
-class Context {
-  struct Impl;
-
+class ContextOwner {
 public:
-  static Context &GetInstance();
+  static ContextOwner &GetInstance();
+  ~ContextOwner();
 
-  ~Context();
+  ContextOwner(const ContextOwner &) = delete;
+  ContextOwner &operator=(const ContextOwner &) = delete;
+  ContextOwner(ContextOwner &&) = delete;
+  ContextOwner &operator=(ContextOwner &&) = delete;
 
-  Context(const Context &) = delete;
-  Context &operator=(const Context &) = delete;
-  Context(Context &&) noexcept = delete;
-  Context &operator=(Context &&) noexcept = delete;
-
-  MTLDevicePtr GetDevice();
-  MTLCommandQueuePtr GetCommandQueue();
-  MTLComputePipelineStatePtr GetComputePipelineState(const std::string &kname);
-  MTLComputeCommandEncoderPtr GetCommandEncoder();
-
-  MTLBufferPtr MakeBuffer(const void *data, size_t size);
-  void SetCommandEncoderComputePipelineState(void *encoder, void *state);
-  void SetCommandEncoderBuffer(void *encoder, void *buffer, int offset,
-                               int index);
-  unsigned int GetMaxTotalThreadsPerThreadgroup(void *state);
-  unsigned int GetThreadExecutionWidth(void *state);
-  void DispatchThreads(void *encoder, const Size &threads,
-                       const Size &threadsPerThreadgroup);
-  void EndEncoding(void *encoder);
-  bool Commit();
-
-#if defined(CUTENN_METAL_DEBUG)
-  void MakeCaptureScopeAvailable();
-  void BeginCaptureScope();
-  void EndCaptureScope();
-  void PushCommandEncoderToDebugGroup(void *encoder, const std::string &label);
-  void PopCommandEncoderFromDebugGroup(void *encoder);
-#endif // CUTENN_METAL_DEBUG
+  MTL4CuteContext *Get() { return context_; }
 
 private:
-  Context();
+  ContextOwner();
 
-  CuteContextImpl *impl_;
+  MTL4CuteContext *context_;
 };
 
 } // namespace cutenn
+
+#define CUTE_CONTEXT cutenn::ContextOwner::GetInstance().Get()
 
 #endif // !CUTENN_BASE_CONTEXT_H_

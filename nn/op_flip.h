@@ -11,7 +11,6 @@ class OpFlip final : public OpBase {
 public:
   bool Forward(Tensor &src, Tensor &dst) override;
   std::string GetKernelName() const;
-  MTLBufferPtr MakeAttribute(Tensor &src, Tensor &dst) override;
 };
 
 } // namespace cutenn
